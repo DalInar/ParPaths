@@ -10,4 +10,4 @@ SET(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINKFLAGS})
 include_directories(${MPI_INCLUDE_PATH})
 
 target_link_libraries(parpaths ${MPI_LIBRARIES})
-SET(CMAKE_BUILD_TYPE Release)
+SET(CMAKE_BUILD_TYPE Debug)
