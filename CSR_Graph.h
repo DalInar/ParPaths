@@ -1,0 +1,39 @@
+/*
+ * CSR_Graph.h
+ *
+ *  Created on: Dec 4, 2014
+ *      Author: pakij
+ */
+
+#ifndef CSR_GRAPH_H_
+#define CSR_GRAPH_H_
+
+#include <iostream>
+#include <vector>
+#include<ctime>
+#include<cstdlib>
+#include<time.h>
+
+class CSR_Graph
+{
+public:
+	CSR_Graph(): V(0),E(0),max_weight(0) {}
+	CSR_Graph(int V_, int E_);	//Generate random graph with all weights=1
+	CSR_Graph(int V_, int E_, double max_weight_); //Generate random graph with random weights, bounded by max_weight
+
+	void print_graph();
+
+	void Dijkstra(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
+
+
+
+private:
+	int V;
+	int E;
+	double max_weight;
+	std::vector <int> offsets;
+	std::vector <int> edge_dests;
+	std::vector <double> weights;
+};
+
+#endif /* CSR_GRAPH_H_ */
