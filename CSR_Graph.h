@@ -10,9 +10,20 @@
 
 #include <iostream>
 #include <vector>
-#include<ctime>
-#include<cstdlib>
-#include<time.h>
+#include <ctime>
+#include <cstdlib>
+#include <time.h>
+#include <limits>
+#include <set>
+
+struct Vertex{
+	Vertex(int idx_, double dist_) : idx(idx_), dist(dist_) { }
+	int idx;
+	double dist;
+};
+
+bool operator<(const Vertex &a, const Vertex &b);
+
 
 class CSR_Graph
 {
@@ -24,7 +35,10 @@ public:
 	void print_graph();
 
 	void Dijkstra(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
+	void BellmanFord(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
 
+	bool validate(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
+	double get_edge_weight(int source_, int dest_);
 
 
 private:

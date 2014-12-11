@@ -7,6 +7,11 @@
 
 #include "CSR_Graph.h"
 
+bool operator<(const Vertex &a, const Vertex &b){
+	return (a.dist < b.dist) && (a.idx != b.idx);
+}
+
+
 CSR_Graph::CSR_Graph(int V_, int E_, double max_weight_):V(V_),E(E_),max_weight(max_weight_) {
 	srand (time(NULL));
 
@@ -43,11 +48,169 @@ CSR_Graph::CSR_Graph(int V_, int E_, double max_weight_):V(V_),E(E_),max_weight(
 	}
 }
 
+void CSR_Graph::BellmanFord(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight){
+	predecessors.clear();
+	path_weight.clear();
+	double inf = std::numeric_limits<double>::infinity();
+	predecessors.resize(V,-1);
+	path_weight.resize(V,inf);
+
+	predecessors[source_]=source_;
+	path_weight[source_]=0;
+
+	for(int i=0; i<V; i++){
+		for(int u=0; u<V; u++){
+
+		}
+	}
+
+}
+
 void CSR_Graph::Dijkstra(int source, std::vector <int> &predecessors, std::vector <double> &path_weight) {
 	predecessors.clear();
 	path_weight.clear();
+	double inf = std::numeric_limits<double>::infinity();
 	predecessors.resize(V,-1);
-	path_weight.resize(V,-1.0);
+	path_weight.resize(V,inf);
+
+	//Keep track of where each vertex is in Q
+	std::vector<std::multiset<Vertex>::iterator> v_iters(V);
+
+	std::multiset<Vertex> Q;
+	Q.insert(Vertex(source, 0));
+
+	for(int i=0; i<V; i++){
+		if(i!=source){
+			v_iters[i] = Q.insert(Vertex(i,inf));
+		}
+	}
+
+	std::multiset<Vertex>::iterator Viter=Q.begin();
+	std::cout<<"Initial Contents of Q"<<std::endl;
+	while(Viter != Q.end()){
+		std::cout<<(*Viter).idx<<"\t"<<(*Viter).dist<<std::endl;
+		Viter++;
+	}
+	std::cout<<std::endl;
+
+	int c_vert, first_target_index, last_target_index;
+	int d_vert;
+	double edge_weight;;
+	double c_dist;
+	predecessors[source]=source;
+	path_weight[source]=0;
+	while(!Q.empty()){
+		//Get next vertex with shortest dist in Q, remove from Q
+		Viter=Q.begin();
+		c_vert=(*Viter).idx;
+		c_dist=(*Viter).dist;
+		Q.erase(Viter);
+
+		//Find out where c_vert's adjacency list starts and ends in edge_dests and weights
+		first_target_index=offsets[c_vert];
+		if(c_vert != V-1){
+			last_target_index=offsets[c_vert+1];
+		}
+		else{
+			last_target_index=E;
+		}
+		//Scan through adjacency list of c_vert
+		for(int target_index=first_target_index; target_index<last_target_index; target_index++){
+			d_vert = edge_dests[target_index];
+			edge_weight = weights[target_index];
+			//Check if edge should be relaxed
+			if(path_weight[d_vert] > c_dist + edge_weight){
+				Q.erase(v_iters[d_vert]);
+				v_iters[d_vert] = Q.insert(Vertex(d_vert, c_dist+edge_weight));
+				predecessors[d_vert] = c_vert;
+				path_weight[d_vert] = c_dist+edge_weight;
+			}
+		}
+
+	}
+
+}
+
+double CSR_Graph::get_edge_weight(int source_, int dest_){
+	//Find out where c_vert's adjacency list starts and ends in edge_dests and weights
+	int first_target_index, last_target_index;
+	first_target_index=offsets[source_];
+	if(source_ != V-1){
+		last_target_index=offsets[source_+1];
+	}
+	else{
+		last_target_index=E;
+	}
+	//Scan through adjacency list of c_vert
+	for(int target_index=first_target_index; target_index<last_target_index; target_index++){
+		if(edge_dests[target_index]==dest_){
+			return weights[target_index];
+		}
+	}
+	return -1.0;
+}
+
+bool CSR_Graph::validate(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight){
+
+	if(path_weight[source_] != 0){
+		std::cout<<"Error, distance from s to s is "<<path_weight[source_]<<std::endl;
+		return false;
+	}
+
+	for(int v=0; v<V; v++){
+		int p=predecessors[v];
+		if(p<0){
+			if(path_weight[v] != std::numeric_limits<double>::infinity()){
+				std::cout<<"Error, vertex "<<v<<" unconnected to source "<<source_<<", but path weight = "<<path_weight[v]<<std::endl;
+				return false;
+			}
+			continue;
+		}
+		if(v==source_){
+			continue;
+		}
+		std::set <int> preds;
+
+		//Check that the tree is a tree
+		while((p>=0) && (p!=source_)){
+			if(preds.insert(p).second == false){
+				std::cout<<"Error, predecessor "<<p<<" seen twice from "<<v<<std::endl;
+				return false;
+			}
+			p=predecessors[p];
+		}
+
+		p=predecessors[v];
+		double edge_weight=get_edge_weight(p,v);
+
+		//Check that d(s,v)=d(s,p(v))+w(p(v),v)
+		if(edge_weight < 0 || path_weight[v] != (path_weight[predecessors[v]] + edge_weight)){
+			std::cout<<"Error, paths weights from "<<source_<<" to "<<v<<" are incorrect"<<std::endl;
+			std::cout<<edge_weight<<"\t"<<path_weight[v]<<"\t"<<path_weight[predecessors[v]] + edge_weight<<std::endl;
+			return false;
+		}
+
+		//Check that edges cannot be relaxed
+		int first_target_index, last_target_index;
+		first_target_index=offsets[source_];
+		if(source_ != V-1){
+			last_target_index=offsets[source_+1];
+		}
+		else{
+			last_target_index=E;
+		}
+		//Scan through adjacency list of c_vert
+		for(int target_index=first_target_index; target_index<last_target_index; target_index++){
+			int dest = edge_dests[target_index];
+			edge_weight = weights[target_index];
+			if(path_weight[dest] > path_weight[v] + edge_weight){
+				std::cout<<"Error, edge from "<<v<<" to "<<dest<<" can be relaxed"<<std::endl;
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 void CSR_Graph::print_graph() {
