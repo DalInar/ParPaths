@@ -8,6 +8,8 @@
 #ifndef CUDA_TEST_CLASS_H_
 #define CUDA_TEST_CLASS_H_
 
+#include <iostream>
+
 class cuda_test_class{
 public:
 	cuda_test_class(int N_);
