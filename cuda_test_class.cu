@@ -1,4 +1,4 @@
-#include <cuda_test_class.h>
+#include "cuda_test_class.h"
 
 __global__ void add(int *a, int *b, int *c){
 	c[blockIdx.x] = a[blockIdx.x] + b[blockIdx.x];
