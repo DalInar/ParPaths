@@ -36,7 +36,9 @@ int main(void){
 
 	int N=10;
 	cuda_test_class c_test(N);
+	std::cout<<"Created class"<<std::endl;
 	c_test.add();
+	std::cout<<"Now check"<<std::endl;
 	std::cout<<"Passed? "<<c_test.check()<<std::endl;
 
 	std::cout<<"Hello World!"<<std::endl;
