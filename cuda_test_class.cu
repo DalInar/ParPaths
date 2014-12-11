@@ -18,6 +18,7 @@ cuda_test_class::cuda_test_class(int N_){
 
 bool cuda_test_class::check(){
 	for(int i=0; i<N; i++){
+		std::cout<<i<<std::endl;
 		if(a[i] + b[i] != c[i]){
 			std::cout<<"Error! Sum not correct for index "<<i<<std::endl;
 			std::cout<<a[i]<<" + "<<b[i]<<" != "<<c[i]<<std::endl;
