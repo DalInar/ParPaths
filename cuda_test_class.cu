@@ -1,6 +1,6 @@
 #include "cuda_test_class.h"
 
-__global__ void add(int *a, int *b, int *c){
+__global__ void class_add(int *a, int *b, int *c){
 	c[blockIdx.x] = a[blockIdx.x] + b[blockIdx.x];
 }
 
@@ -40,7 +40,7 @@ void cuda_test_class::add(){
 	cudaMemcpy(d_a, &a, size, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_b, &b, size, cudaMemcpyHostToDevice);
 
-	add<<<N,1>>>(d_a,d_b);
+	class_add<<<N,1>>>(d_a,d_b,d_c);
 
 	//Copy results back to host
 	cudaMemcpy(&c, d_c, size, cudaMemcpyDeviceToHost);
