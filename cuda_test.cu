@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include "cuda_test_class.h"
 
 __global__ void mykernel(int *a, int * b, int * c){
 	*c=*a+*b;
@@ -32,6 +33,11 @@ int main(void){
 
 	std::cout<<"CUDA answer = "<<c<<std::endl;
 	std::cout<<"Should be = "<<a+b<<std::endl;
+
+	int N=10;
+	cuda_test_class c_test(N);
+	c_test.add();
+	std::cout<<"Passed? "<<c_test.check()<<std::endl;
 
 	std::cout<<"Hello World!"<<std::endl;
 	return 0;
