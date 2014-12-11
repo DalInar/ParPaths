@@ -14,7 +14,7 @@ class cuda_test_class{
 public:
 	cuda_test_class(int N_);
 
-	void class_add();
+	void add();
 	bool check();
 
 private:
