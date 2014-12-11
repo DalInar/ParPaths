@@ -13,6 +13,7 @@ cuda_test_class::cuda_test_class(int N_){
 	for(int i=0; i<N; i++){
 		a[i] = i;
 		b[i] = i*i;
+		c[i] = a[i]+b[i];
 	}
 }
 
