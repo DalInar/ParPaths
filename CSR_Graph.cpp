@@ -56,7 +56,6 @@ CSR_Graph::CSR_Graph(std::string filename):V(0),E(0),max_weight(-1){
 			edge_dests.push_back(v);
 			weights.push_back(weight);
 		}
-
 	}
 	input.close();
 }
