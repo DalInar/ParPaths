@@ -40,7 +40,7 @@ void cuda_test_class::add(){
 	cudaMemcpy(d_a, &a, size, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_b, &b, size, cudaMemcpyHostToDevice);
 
-	add<<<N,1>>>(d_a,d_b,d_c);
+	add<<<N,1>>>(d_a,d_b);
 
 	//Copy results back to host
 	cudaMemcpy(&c, d_c, size, cudaMemcpyDeviceToHost);
