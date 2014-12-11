@@ -13,8 +13,11 @@
 #include <ctime>
 #include <cstdlib>
 #include <time.h>
+#include <ctime>
 #include <limits>
+#include <boost/timer/timer.hpp>
 #include <set>
+#include <fstream>
 
 struct Vertex{
 	Vertex(int idx_, double dist_) : idx(idx_), dist(dist_) { }
@@ -31,8 +34,10 @@ public:
 	CSR_Graph(): V(0),E(0),max_weight(0) {}
 	CSR_Graph(int V_, int E_);	//Generate random graph with all weights=1
 	CSR_Graph(int V_, int E_, double max_weight_); //Generate random graph with random weights, bounded by max_weight
+	CSR_Graph(std::string filename);
 
 	void print_graph();
+	bool print_graph_to_file(std::string filename);
 
 	void Dijkstra(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
 	void BellmanFord(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
