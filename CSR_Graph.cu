@@ -7,7 +7,7 @@
 
 #include "CSR_Graph.h"
 
-__global__ void BellmanFord_cuda(int *offsets, int *edge_dests, double *weights){
+__global__ void BellmanFord_cuda(int *offsets, int *edge_dests, double *weights, int * preds, double * path_weights){
 	weights[blockIdx.x] += 5.7;
 	offsets[blockIdx.x] += 2;
 	edge_dests[blockIdx.x] += 1;
@@ -16,10 +16,19 @@ __global__ void BellmanFord_cuda(int *offsets, int *edge_dests, double *weights)
 void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight){
 	int num_threads = V;
 
+	//Initialize predecessor tree
+	predecessors.clear();
+	path_weight.clear();
+	double inf = std::numeric_limits<double>::infinity();
+	predecessors.resize(V,-1);
+	path_weight.resize(V,inf);
+	predecessors[source_]=source_;
+	path_weight[source_]=0;
+
+	//GPU pointers
 	int *  d_offsets;
 	int * d_edge_dests;
 	double * d_weights;
-
 	int * d_predecessors;
 	double * d_path_weight;
 
@@ -37,6 +46,9 @@ void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std
 	cudaMalloc((void **) & d_edge_dests, edge_dests_size);
 	cudaMalloc((void **) & d_weights, weights_size);
 
+	cudaMalloc((void **) & d_predecessors, predecessors_size);
+	cudaMalloc((void **) & d_path_weight, path_weight_size);
+
 	std::cout<<"Printing unmodified weights, offsets, edge_dests"<<std::endl;
 	for(int i=0; i<V; i++){
 		std::cout<<i<<" "<<weights[i]<<std::endl;
@@ -48,14 +60,18 @@ void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std
 	cudaMemcpy(d_offsets, (int *) &offsets[0], offsets_size, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_edge_dests, (int *) &edge_dests[0], edge_dests_size, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_weights, (double *) &weights[0], weights_size, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_predecessors, (int *) &predecessors[0], predecessors_size, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_path_weight, (double *) &path_weight[0], path_weight_size, cudaMemcpyHostToDevice);
 
 	std::cout<<"Running kernel"<<std::endl;
-	BellmanFord_cuda<<<num_threads,1>>>(d_offsets,d_edge_dests,d_weights);
+	BellmanFord_cuda<<<num_threads,1>>>(d_offsets,d_edge_dests,d_weights,d_predecessors,d_path_weight);
 
 	//Copy results back to host
 	cudaMemcpy((int *) &offsets[0], d_offsets, offsets_size, cudaMemcpyDeviceToHost);
 	cudaMemcpy((int *) &edge_dests[0], d_edge_dests, edge_dests_size, cudaMemcpyDeviceToHost);
 	cudaMemcpy((double *) &weights[0], d_weights, weights_size, cudaMemcpyDeviceToHost);
+	cudaMemcpy((int *) &predecessors[0], d_predecessors, predecessors_size, cudaMemcpyDeviceToHost);
+	cudaMemcpy((double *) &path_weight[0], d_path_weight, path_weight_size, cudaMemcpyDeviceToHost);
 
 	std::cout<<"Printing GPU modified weights, offsets, edge_dests"<<std::endl;
 	for(int i=0; i<V; i++){
