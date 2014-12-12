@@ -10,9 +10,10 @@ cuda_test_class::~cuda_test_class(){
 
 cuda_test_class::cuda_test_class(int N_){
 	N=N_;
-	a = (int *) malloc(N);
-	b = (int *) malloc(N);
-	c = (int *) malloc(N);
+	int size=N*sizeof(int);
+	a = (int *) malloc(size);
+	b = (int *) malloc(size);
+	c = (int *) malloc(size);
 
 	for(int i=0; i<N; i++){
 		a[i] = i;
