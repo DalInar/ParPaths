@@ -43,8 +43,8 @@ void cuda_test_class::add(){
 	cudaMalloc((void **) & d_c, size);
 
 	//Copy inputs to device
-	cudaMemcpy(d_a, &a, size, cudaMemcpyHostToDevice);
-	cudaMemcpy(d_b, &b, size, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_a, a, size, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_b, b, size, cudaMemcpyHostToDevice);
 
 	gpu_add<<<N,1>>>(d_a,d_b,d_c);
 
