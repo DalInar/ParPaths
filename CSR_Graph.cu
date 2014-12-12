@@ -7,15 +7,62 @@
 
 #include "CSR_Graph.h"
 
+__global__ void BellmanFord_cuda(int *offsets, int *edge_dests, int *weights){
+	weights[blockIdx.x] += 5.7
+	offsets[blockIdx.x] += 2;
+	edge_dests[blockIdx.x] += 1;
+}
+
+void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight){
+	int num_threads = V;
+
+	int *  d_offsets;
+	int * d_edge_dests;
+	double * d_weights;
+
+	int offsets_size = V*sizeof(int);
+	int edge_dests_size = E*sizeof(int);
+	int weights_size = E*sizeof(double);
+
+	//Allocate memory on device
+	cudaMalloc((void **) & d_offsets, offsets_size);
+	cudaMalloc((void **) & d_edge_dests, edge_dests_size);
+	cudaMalloc((void **) & d_weights, weights_size);
+
+	for(int i=0; i<E; i++){
+		std::cout<<i<<" "<<weights[i]<<std::endl;
+	}
+
+	cudaMemcpy(d_offsets, (int *) &offsets, offsets_size, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_edge_dests, (int *) &edge_dests, edge_dests_size, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_weights, (double *) &weights, weights_size, cudaMemcpyHostToDevice);
+
+	BellmanFord_cuda<<<num_threads,1>>>(d_offsets,d_edge_dests,d_weights);
+
+	//Copy results back to host
+	cudaMemcpy((int *) &offsets, d_offsets, offsets_size, cudaMemcpyDeviceToHost);
+	cudaMemcpy((int *) &edge_dests, d_edge_dests, edge_dests_size, cudaMemcpyDeviceToHost);
+	cudaMemcpy((double *) &weights, d_weights, weights_size, cudaMemcpyDeviceToHost);
+
+	for(int i=0; i<E; i++){
+		std::cout<<i<<" "<<weights[i]<<std::endl;
+	}
+
+	//cleanup
+	cudaFree(d_offsets); cudaFree(d_edge_dests); cudaFree(d_weights);
+}
+
+
+//Simple test code
 __global__ void test_add(int *a, int *b, int *c){
 	c[blockIdx.x] = a[blockIdx.x] + b[blockIdx.x];
 }
 
-void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight){
-
+bool CSR_Graph::test_cuda(){
 	int N=1000;
 	int *a, *b, *c;
 	int *d_a, *d_b, *d_c;
+	bool result = true;
 
 	int size=N*sizeof(int);
 	a = (int *) malloc(size);
@@ -43,13 +90,15 @@ void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std
 
 	std::cout<<std::endl<<"GPU output"<<std::endl;
 	for(int i=0; i<N; i++){
-		std::cout<<c[i]<<" ?= "<<a[i]+b[i]<<std::endl;
+		//std::cout<<c[i]<<" ?= "<<a[i]+b[i]<<std::endl;
+		if(c[i] != a[i] + b[i]){
+			result = false;
+		}
 	}
 
 	//cleanup
 	cudaFree(d_a); cudaFree(d_b); cudaFree(d_c);
 	free(a); free(b); free(c);
+
+	return result;
 }
-
-
-

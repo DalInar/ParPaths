@@ -47,6 +47,8 @@ public:
 	bool validate(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
 	double get_edge_weight(int source_, int dest_);
 
+	bool test_cuda();
+
 
 private:
 	int V;

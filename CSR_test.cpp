@@ -21,7 +21,6 @@ int main(){
 	std::vector <int> predecessors_BF;
 	std::vector <double> path_weight_BF;
 	G.Dijkstra(source, predecessors, path_weight);
-	G.BellmanFordGPU(source, predecessors, path_weight);
 	//G.BellmanFord(source, predecessors_BF, path_weight_BF);
 
 	std::cout<<"Dijkstra SSSP Valid: "<<G.validate(source, predecessors, path_weight)<<std::endl;
@@ -36,6 +35,9 @@ int main(){
 	G.print_graph_to_file(filename);
 	CSR_Graph G_new = CSR_Graph(filename);
 	G_new.print_graph();
+
+	CSR_Graph G_gpu = CSR_Graph(5,8,12.3);
+	G_gpu.BellmanFordGPU(source, predecessors_BF, path_weight_BF);
 
 	std::cout<<"Finished!"<<std::endl;
 	return 0;
