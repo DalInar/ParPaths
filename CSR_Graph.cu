@@ -8,9 +8,9 @@
 #include "CSR_Graph.h"
 
 __global__ void BellmanFord_cuda(int *offsets, int *edge_dests, double *weights){
-	//weights[blockIdx.x] += 5.7;
+	weights[blockIdx.x] += 5.7;
 	offsets[blockIdx.x] += 2;
-	//edge_dests[blockIdx.x] += 1;
+	edge_dests[blockIdx.x] += 1;
 }
 
 void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight){
@@ -37,10 +37,11 @@ void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std
 	cudaMalloc((void **) & d_edge_dests, edge_dests_size);
 	cudaMalloc((void **) & d_weights, weights_size);
 
-	std::cout<<"Printing unmodified weights, offsets"<<std::endl;
+	std::cout<<"Printing unmodified weights, offsets, edge_dests"<<std::endl;
 	for(int i=0; i<V; i++){
 		std::cout<<i<<" "<<weights[i]<<std::endl;
 		std::cout<<i<<" "<<offsets[i]<<std::endl;
+		std::cout<<i<<" "<<edge_dests[i]<<std::endl;
 	}
 
 	std::cout<<"Transferring to GPU"<<std::endl;
@@ -56,10 +57,11 @@ void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std
 	cudaMemcpy((int *) &edge_dests[0], d_edge_dests, edge_dests_size, cudaMemcpyDeviceToHost);
 	cudaMemcpy((double *) &weights[0], d_weights, weights_size, cudaMemcpyDeviceToHost);
 
-	std::cout<<"Printing GPU modified weights, offsets"<<std::endl;
+	std::cout<<"Printing GPU modified weights, offsets, edge_dests"<<std::endl;
 	for(int i=0; i<V; i++){
 		std::cout<<i<<" "<<weights[i]<<std::endl;
 		std::cout<<i<<" "<<offsets[i]<<std::endl;
+		std::cout<<i<<" "<<edge_dests[i]<<std::endl;
 	}
 
 	//cleanup
