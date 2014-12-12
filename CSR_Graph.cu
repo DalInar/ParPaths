@@ -44,17 +44,17 @@ void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std
 	}
 
 	std::cout<<"Transferring to GPU"<<std::endl;
-	cudaMemcpy(d_offsets, (int *) &offsets, offsets_size, cudaMemcpyHostToDevice);
-	cudaMemcpy(d_edge_dests, (int *) &edge_dests, edge_dests_size, cudaMemcpyHostToDevice);
-	cudaMemcpy(d_weights, (double *) &weights, weights_size, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_offsets, (int *) &offsets[0], offsets_size, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_edge_dests, (int *) &edge_dests[0], edge_dests_size, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_weights, (double *) &weights[0], weights_size, cudaMemcpyHostToDevice);
 
 	std::cout<<"Running kernel"<<std::endl;
 	BellmanFord_cuda<<<num_threads,1>>>(d_offsets,d_edge_dests,d_weights);
 
 	//Copy results back to host
-	cudaMemcpy((int *) &offsets, d_offsets, offsets_size, cudaMemcpyDeviceToHost);
-	cudaMemcpy((int *) &edge_dests, d_edge_dests, edge_dests_size, cudaMemcpyDeviceToHost);
-	cudaMemcpy((double *) &weights, d_weights, weights_size, cudaMemcpyDeviceToHost);
+	cudaMemcpy((int *) &offsets[0], d_offsets, offsets_size, cudaMemcpyDeviceToHost);
+	cudaMemcpy((int *) &edge_dests[0], d_edge_dests, edge_dests_size, cudaMemcpyDeviceToHost);
+	cudaMemcpy((double *) &weights[0], d_weights, weights_size, cudaMemcpyDeviceToHost);
 
 	std::cout<<"Printing GPU modified weights, offsets"<<std::endl;
 	for(int i=0; i<V; i++){
