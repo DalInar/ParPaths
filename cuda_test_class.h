@@ -13,6 +13,7 @@
 class cuda_test_class{
 public:
 	cuda_test_class(int N_);
+	~cuda_test_class();
 
 	void add();
 	bool check();

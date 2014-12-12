@@ -39,6 +39,7 @@ int main(void){
 	std::cout<<"Created class"<<std::endl;
 	std::cout<<"Now check"<<std::endl;
 	std::cout<<"Passed? "<<c_test.check()<<std::endl;
+	std::cout<<"GPU adding"<<std::endl;
 	c_test.add();
 	std::cout<<"Now check gpu"<<std::endl;
 	std::cout<<"Passed? "<<c_test.check()<<std::endl;

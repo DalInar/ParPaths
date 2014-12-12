@@ -4,6 +4,10 @@ __global__ void gpu_add(int *a, int *b, int *c){
 	c[blockIdx.x] = a[blockIdx.x] + b[blockIdx.x];
 }
 
+cuda_test_class::~cuda_test_class(){
+	free(a); free(b); free(c);
+}
+
 cuda_test_class::cuda_test_class(int N_){
 	N=N_;
 	a = (int *) malloc(N);
@@ -45,7 +49,7 @@ void cuda_test_class::add(){
 	gpu_add<<<N,1>>>(d_a,d_b,d_c);
 
 	//Copy results back to host
-	cudaMemcpy(&c, d_c, size, cudaMemcpyDeviceToHost);
+	cudaMemcpy(c, d_c, size, cudaMemcpyDeviceToHost);
 
 	//cleanup
 	cudaFree(d_a); cudaFree(d_b); cudaFree(d_c);
