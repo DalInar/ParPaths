@@ -34,6 +34,12 @@ void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std
 	//Copy results back to host
 	cudaMemcpy(c, d_c, size, cudaMemcpyDeviceToHost);
 
+
+	std::cout<<std::endl<<"GPU output"<<std::endl;
+	for(int i=0; i<N; i++){
+		std::cout<<c[i]<<" ?= "<<a[i]+b[i]<<std::endl;
+	}
+
 	//cleanup
 	cudaFree(d_a); cudaFree(d_b); cudaFree(d_c);
 	free(a); free(b); free(c);
