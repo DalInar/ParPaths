@@ -7,8 +7,8 @@
 
 #include "CSR_Graph.h"
 
-__global__ void BellmanFord_cuda(int *offsets, int *edge_dests, int *weights){
-	weights[blockIdx.x] += 5.7
+__global__ void BellmanFord_cuda(int *offsets, int *edge_dests, double *weights){
+	weights[blockIdx.x] += 5.7;
 	offsets[blockIdx.x] += 2;
 	edge_dests[blockIdx.x] += 1;
 }
