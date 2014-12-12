@@ -13,7 +13,7 @@ __global__ void test_add(int *a, int *b, int *c){
 
 void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight){
 
-	int N=5;
+	int N=1000;
 	int *a, *b, *c;
 	int *d_a, *d_b, *d_c;
 
@@ -24,6 +24,12 @@ void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std
 	cudaMalloc((void **) & d_a, size);
 	cudaMalloc((void **) & d_b, size);
 	cudaMalloc((void **) & d_c, size);
+
+	std::cout<<std::endl<<"GPU output"<<std::endl;
+	for(int i=0; i<N; i++){
+		a[i]=i;
+		b[i]=i*i;
+	}
 
 	//Copy inputs to device
 	cudaMemcpy(d_a, a, size, cudaMemcpyHostToDevice);
