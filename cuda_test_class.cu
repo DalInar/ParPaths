@@ -1,7 +1,7 @@
 #include "cuda_test_class.h"
 
 __global__ void gpu_add(int *a, int *b, int *c){
-	c[blockIdx.x] = min(a[blockIdx.x] + b[blockIdx.x]);
+	c[blockIdx.x] = min(a[blockIdx.x], b[blockIdx.x]);
 }
 
 cuda_test_class::~cuda_test_class(){
