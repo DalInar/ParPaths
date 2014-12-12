@@ -38,7 +38,7 @@ void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std
 	cudaMalloc((void **) & d_weights, weights_size);
 
 	std::cout<<"Printing unmodified weights, offsets"<<std::endl;
-	for(int i=0; i<E; i++){
+	for(int i=0; i<V; i++){
 		std::cout<<i<<" "<<weights[i]<<std::endl;
 		std::cout<<i<<" "<<offsets[i]<<std::endl;
 	}
@@ -57,7 +57,7 @@ void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std
 	cudaMemcpy((double *) &weights, d_weights, weights_size, cudaMemcpyDeviceToHost);
 
 	std::cout<<"Printing GPU modified weights, offsets"<<std::endl;
-	for(int i=0; i<E; i++){
+	for(int i=0; i<V; i++){
 		std::cout<<i<<" "<<weights[i]<<std::endl;
 		std::cout<<i<<" "<<offsets[i]<<std::endl;
 	}
