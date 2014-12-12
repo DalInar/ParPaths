@@ -21,6 +21,7 @@ int main(){
 	std::vector <int> predecessors_BF;
 	std::vector <double> path_weight_BF;
 	G.Dijkstra(source, predecessors, path_weight);
+	G.BellmanFordGPU(source, predecessors, path_weight);
 	//G.BellmanFord(source, predecessors_BF, path_weight_BF);
 
 	std::cout<<"Dijkstra SSSP Valid: "<<G.validate(source, predecessors, path_weight)<<std::endl;
