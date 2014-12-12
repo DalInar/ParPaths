@@ -36,7 +36,7 @@ int main(){
 	CSR_Graph G_new = CSR_Graph(filename);
 	G_new.print_graph();
 
-	CSR_Graph G_gpu = CSR_Graph(5,8,12.3);
+	CSR_Graph G_gpu = CSR_Graph(5,10,12.3);
 	G_gpu.BellmanFordGPU(source, predecessors_BF, path_weight_BF);
 
 	std::cout<<"Finished!"<<std::endl;
