@@ -7,7 +7,7 @@
 
 #include "CSR_Graph.h"
 
-__global__ void BellmanFord_cuda(int * V, int *E, int *offsets, int *edge_dests, double *weights, int * preds, double * path_weights){
+__global__ void BellmanFord_cuda(int V, int E, int *offsets, int *edge_dests, double *weights, int * preds, double * path_weights){
 	int my_vert = blockIdx.x;
 	int source_vert;
 
@@ -15,9 +15,9 @@ __global__ void BellmanFord_cuda(int * V, int *E, int *offsets, int *edge_dests,
 	double trial_dist;
 
 	source_vert=0;
-	for(int i=0; i<(*E); i++){
+	for(int i=0; i<E; i++){
 		if(edge_dests[i] == my_vert){
-			while(source_vert != (*V)-1  || offsets[source_vert+1] > i){
+			while(source_vert != V-1  || offsets[source_vert+1] > i){
 				source_vert++;
 			}
 			trial_dist = weights[i] + path_weights[source_vert];
@@ -42,8 +42,6 @@ void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std
 	path_weight[source_]=0;
 
 	//GPU pointers
-	int * d_V;
-	int * d_E;
 	int *  d_offsets;
 	int * d_edge_dests;
 	double * d_weights;
@@ -65,12 +63,8 @@ void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std
 	cudaMalloc((void **) & d_weights, weights_size);
 	cudaMalloc((void **) & d_predecessors, predecessors_size);
 	cudaMalloc((void **) & d_path_weight, path_weight_size);
-	cudaMalloc((void **) & d_E, sizeof(int));
-	cudaMalloc((void **) & d_V, sizeof(int));
 
 	std::cout<<"Transferring to GPU"<<std::endl;
-	cudaMemcpy(d_V, &V, sizeof(int), cudaMemcpyHostToDevice);
-	cudaMemcpy(d_E, &E, sizeof(int), cudaMemcpyHostToDevice);
 	cudaMemcpy(d_offsets, (int *) &offsets[0], offsets_size, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_edge_dests, (int *) &edge_dests[0], edge_dests_size, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_weights, (double *) &weights[0], weights_size, cudaMemcpyHostToDevice);
@@ -79,7 +73,8 @@ void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std
 
 	std::cout<<"Running kernel"<<std::endl;
 	for(int iter=0; iter<V; iter++){
-		BellmanFord_cuda<<<num_threads,1>>>(d_V, d_E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_path_weight);
+		std::cout<<iter<<std::endl;
+		BellmanFord_cuda<<<num_threads,1>>>(V, E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_path_weight);
 		cudaDeviceSynchronize();
 	}
 
