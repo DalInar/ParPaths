@@ -17,7 +17,9 @@ __global__ void BellmanFord_cuda(int V, int E, int *offsets, int *edge_dests, do
 	path_weights[blockIdx.x]=73.2;
 	source_vert=0;
 	for(int i=0; i<E; i++){
+		preds[blockIdx.x] += 1;
 		if(edge_dests[i] == my_vert){
+			preds[blockIdx.x] += 100;
 			while(source_vert != V-1  && offsets[source_vert+1] > i){
 				source_vert++;
 			}
