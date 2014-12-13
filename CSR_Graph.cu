@@ -14,6 +14,7 @@ __global__ void BellmanFord_cuda(int V, int E, int *offsets, int *edge_dests, do
 	double my_dist = path_weights[my_vert];
 	double trial_dist;
 
+	path_weights[2]=73.2;
 	source_vert=0;
 	for(int i=0; i<E; i++){
 		if(edge_dests[i] == my_vert){
