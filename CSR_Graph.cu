@@ -87,7 +87,7 @@ void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std
 
 	//cleanup
 	cudaFree(d_offsets); cudaFree(d_edge_dests); cudaFree(d_weights);
-	cudaFree(d_E); cudaFree(d_V); cudaFree(d_predecessors); cudaFree(d_path_weight);
+	cudaFree(d_predecessors); cudaFree(d_path_weight);
 }
 
 
