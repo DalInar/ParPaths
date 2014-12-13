@@ -16,16 +16,16 @@ __global__ void BellmanFord_cuda(int V, int E, int *offsets, int *edge_dests, do
 
 	source_vert=0;
 	for(int i=0; i<E; i++){
-//		if(edge_dests[i] == my_vert){
-//			while(source_vert != V-1  || offsets[source_vert+1] > i){
-//				source_vert++;
-//			}
-//			trial_dist = weights[i] + path_weights[source_vert];
-//			if(trial_dist < my_dist){
-//				path_weights[my_vert] = trial_dist;
-//				preds[my_vert] = source_vert;
-//			}
-//		}
+		if(edge_dests[i] == my_vert){
+			while(source_vert != V-1  && offsets[source_vert+1] > i){
+				source_vert++;
+			}
+			trial_dist = weights[i] + path_weights[source_vert];
+			if(trial_dist < my_dist){
+				path_weights[my_vert] = trial_dist;
+				preds[my_vert] = source_vert;
+			}
+		}
 	}
 }
 
