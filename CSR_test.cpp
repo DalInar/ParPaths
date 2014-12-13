@@ -36,11 +36,17 @@ int main(){
 	CSR_Graph G_new = CSR_Graph(filename);
 	G_new.print_graph();
 
-	CSR_Graph G_gpu = CSR_Graph(5,10,12.3);
+	V=5;
+	CSR_Graph G_gpu = CSR_Graph(V,10,12.3);
 	G_gpu.BellmanFordGPU(source, predecessors_BF, path_weight_BF);
 	G_gpu.Dijkstra(source, predecessors, path_weight);
 
 	std::cout<<"Are they equal? "<< ((predecessors==predecessors_BF) && (path_weight== path_weight_BF)) << std::endl;
+	for(int i=0; i < V; i++){
+		std::cout<<"V: "<<i<<std::endl;
+		std::cout<<predecessors[i]<<"\t"<<predecessors_BF[i]<<std::endl;
+		std::cout<<path_weight[i]<<"\t"<<path_weight_BF[i]<<std::endl;
+	}
 
 	std::cout<<"Finished!"<<std::endl;
 	return 0;
