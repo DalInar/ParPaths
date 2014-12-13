@@ -73,7 +73,7 @@ void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std
 	cudaMemcpy(d_path_weight, (double *) &path_weight[0], path_weight_size, cudaMemcpyHostToDevice);
 
 	std::cout<<"Running kernel"<<std::endl;
-	for(int iter=0; iter<1; iter++){
+	for(int iter=0; iter<V; iter++){
 		std::cout<<iter<<std::endl;
 		BellmanFord_cuda<<<num_threads,1>>>(V, E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_path_weight);
 		cudaDeviceSynchronize();
