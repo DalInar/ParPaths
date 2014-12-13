@@ -38,6 +38,9 @@ int main(){
 
 	CSR_Graph G_gpu = CSR_Graph(5,10,12.3);
 	G_gpu.BellmanFordGPU(source, predecessors_BF, path_weight_BF);
+	G_gpu.Dijkstra(source, predecessors, path_weight);
+
+	std::cout<<"Are they equal? "<< ((predecessors==predecessors_BF) && (path_weight== path_weight_BF)) << std::endl;
 
 	std::cout<<"Finished!"<<std::endl;
 	return 0;
