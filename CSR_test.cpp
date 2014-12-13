@@ -38,6 +38,7 @@ int main(){
 
 	V=5;
 	CSR_Graph G_gpu = CSR_Graph(V,10,12.3);
+	G_gpu.print_graph();
 	G_gpu.BellmanFordGPU(source, predecessors_BF, path_weight_BF);
 	G_gpu.Dijkstra(source, predecessors, path_weight);
 

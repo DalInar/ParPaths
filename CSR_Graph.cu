@@ -14,16 +14,14 @@ __global__ void BellmanFord_cuda(int V, int E, int *offsets, int *edge_dests, do
 	double my_dist = path_weights[my_vert];
 	double trial_dist;
 
-	path_weights[blockIdx.x]=73.2;
 	source_vert=0;
 	for(int i=0; i<E; i++){
-		preds[blockIdx.x] += 1;
 		if(edge_dests[i] == my_vert){
-			preds[blockIdx.x] += 100;
 			while(source_vert != V-1  && offsets[source_vert+1] > i){
 				source_vert++;
 			}
-			trial_dist = weights[i] + path_weights[source_vert];
+			trial_dist = weights[i] + path_weights[source_vert]; //Data race, possibly benign?
+			preds[blockIdx.x] = trial_dist;
 			if(trial_dist < my_dist){
 				path_weights[my_vert] = trial_dist;
 				preds[my_vert] = source_vert;
@@ -75,7 +73,7 @@ void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std
 	cudaMemcpy(d_path_weight, (double *) &path_weight[0], path_weight_size, cudaMemcpyHostToDevice);
 
 	std::cout<<"Running kernel"<<std::endl;
-	for(int iter=0; iter<V; iter++){
+	for(int iter=0; iter<1; iter++){
 		std::cout<<iter<<std::endl;
 		BellmanFord_cuda<<<num_threads,1>>>(V, E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_path_weight);
 		cudaDeviceSynchronize();
