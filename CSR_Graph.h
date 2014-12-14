@@ -44,7 +44,7 @@ public:
 
 	double BellmanFordGPU(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
 
-	double BellmanFordAtomicGPU(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
+	double BellmanFordGPU_Split(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
 
 	bool validate(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
 	double get_edge_weight(int source_, int dest_);
