@@ -46,7 +46,7 @@ int main(){
 	std::cout<<"Dijkstra time: "<<G_gpu.Dijkstra(source, predecessors, path_weight)<<std::endl;
 	std::cout<<"Bellman-Ford GPU time: "<<G_gpu.BellmanFordGPU(source, predecessors_BF_gpu, path_weight_BF_gpu)<<std::endl;
 
-	std::cout<<"Are they equal? "<< ((predecessors==predecessors_BF) && (path_weight== path_weight_BF)) << std::endl;
+	std::cout<<"Are they equal? "<< (predecessors==predecessors_BF_gpu)<< std::endl;
 	for(int i=0; i < 5; i++){
 		std::cout<<"V: "<<i<<std::endl;
 		std::cout<<predecessors[i]<<"\t"<<predecessors_BF_gpu[i]<<std::endl;
