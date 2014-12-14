@@ -60,7 +60,7 @@ int main(){
 		G_gpu.set_threads_per_block(threads_per_block);
 		GPU_time<<threads_per_block<<"\t"<<G_gpu.BellmanFordGPU(source, predecessors_BF_gpu, path_weight_BF_gpu)<<std::endl;
 		if(threads_per_block ==1){
-			threads_per_block = 1;
+			threads_per_block = 32;
 		}
 		else{
 			threads_per_block += 32;
