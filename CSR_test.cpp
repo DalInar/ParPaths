@@ -32,15 +32,15 @@ int main(){
 //	}
 
 	std::string filename = "output.txt";
-	V=5;
-	CSR_Graph G_gpu = CSR_Graph(V,10,12.3);
-	G_gpu.print_graph();
+	V=10000;
+	CSR_Graph G_gpu = CSR_Graph(V,100000,12.3);
+	//G_gpu.print_graph();
 	G_gpu.print_graph_to_file(filename);
 	G_gpu.BellmanFordGPU(source, predecessors_BF, path_weight_BF);
 	std::cout<<"Dijkstra time: "<<G_gpu.Dijkstra(source, predecessors, path_weight)<<std::endl;
 
 	std::cout<<"Are they equal? "<< ((predecessors==predecessors_BF) && (path_weight== path_weight_BF)) << std::endl;
-	for(int i=0; i < V; i++){
+	for(int i=0; i < 5; i++){
 		std::cout<<"V: "<<i<<std::endl;
 		std::cout<<predecessors[i]<<"\t"<<predecessors_BF[i]<<std::endl;
 		std::cout<<path_weight[i]<<"\t"<<path_weight_BF[i]<<std::endl;
