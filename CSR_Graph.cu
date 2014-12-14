@@ -17,12 +17,11 @@ __global__ void BellmanFord_cuda(int V, int E, int *offsets, int *edge_dests, do
 	source_vert=0;
 	for(int i=0; i<E; i++){
 		if(edge_dests[i] == my_vert){
-			//Keep track of what the source vertex could be, since the edge list sorted by them
+			//we can keep track of what the source vertex could be, since the edge list is sorted by them
 			while(source_vert != V-1  && offsets[source_vert+1] <= i){
 				source_vert++;
 			}
 			trial_dist = weights[i] + path_weights[source_vert]; //Data race, possibly benign?
-			//preds[blockIdx.x] = trial_dist;
 			if(trial_dist < my_dist){
 				path_weights[my_vert] = trial_dist;
 				preds[my_vert] = source_vert;

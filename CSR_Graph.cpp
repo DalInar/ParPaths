@@ -138,9 +138,7 @@ void CSR_Graph::BellmanFord(int source_, std::vector <int> &predecessors, std::v
 	std::cout << "Bellman-Ford Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
 }
 
-void CSR_Graph::Dijkstra(int source, std::vector <int> &predecessors, std::vector <double> &path_weight) {
-	std::clock_t start;
-
+double CSR_Graph::Dijkstra(int source, std::vector <int> &predecessors, std::vector <double> &path_weight) {
 	std::cout<<"Finding shortest paths from V: "<<source<<" with Dijkstra"<<std::endl;
 	predecessors.clear();
 	path_weight.clear();
@@ -150,6 +148,9 @@ void CSR_Graph::Dijkstra(int source, std::vector <int> &predecessors, std::vecto
 
 	//Keep track of where each vertex is in Q
 	std::vector<std::multiset<Vertex>::iterator> v_iters(V);
+
+	boost::timer::auto_cpu_timer t;
+	boost::timer::cpu_timer timer;
 
 	std::multiset<Vertex> Q;
 	Q.insert(Vertex(source, 0));
@@ -174,9 +175,7 @@ void CSR_Graph::Dijkstra(int source, std::vector <int> &predecessors, std::vecto
 	double c_dist;
 	predecessors[source]=source;
 	path_weight[source]=0;
-	start=std::clock();
-	boost::timer::auto_cpu_timer t;
-	//t.start();
+
 	while(!Q.empty()){
 		//Get next vertex with shortest dist in Q, remove from Q
 		Viter=Q.begin();
@@ -206,9 +205,10 @@ void CSR_Graph::Dijkstra(int source, std::vector <int> &predecessors, std::vecto
 		}
 
 	}
-//	t.stop();
-//	std::cout<<"Dijkstra Boost Time: " <<t.elapsed().wall <<std::endl;
-	std::cout << "Dijkstra Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+	timer.stop();
+	timer.elapsed().wall;
+	const boost::timer::nanosecond_type oneSecond(1000000000LL);
+	return timer.elapsed().wall / oneSecond;
 }
 
 double CSR_Graph::get_edge_weight(int source_, int dest_){
