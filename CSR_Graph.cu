@@ -76,7 +76,7 @@ double CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, s
 
 	std::cout<<"Running kernel"<<std::endl;
 	boost::timer::cpu_timer timer;
-	for(int iter=0; iter<V; iter++){
+	for(int iter=0; iter<1; iter++){
 		std::cout<<iter<<std::endl;
 		BellmanFord_cuda<<<num_threads,1>>>(V, E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_path_weight);
 		cudaDeviceSynchronize();
