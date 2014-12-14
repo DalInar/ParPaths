@@ -11,7 +11,7 @@ bool operator<(const Vertex &a, const Vertex &b){
 	return (a.dist < b.dist) && (a.idx != b.idx);
 }
 
-CSR_Graph::CSR_Graph(std::string filename):V(0),E(0),max_weight(-1){
+CSR_Graph::CSR_Graph(std::string filename):V(0),E(0),max_weight(-1), threads_per_block(1){
 	std::ifstream input;
 	input.open(filename.c_str());
 	if(!input.is_open()){
@@ -60,7 +60,7 @@ CSR_Graph::CSR_Graph(std::string filename):V(0),E(0),max_weight(-1){
 	input.close();
 }
 
-CSR_Graph::CSR_Graph(int V_, int E_, double max_weight_):V(V_),E(E_),max_weight(max_weight_) {
+CSR_Graph::CSR_Graph(int V_, int E_, double max_weight_):V(V_),E(E_),max_weight(max_weight_), threads_per_block(1) {
 	srand (time(NULL));
 
 	//Temporary adjacency matrix to assist in creating random graph

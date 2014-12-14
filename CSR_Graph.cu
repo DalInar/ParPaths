@@ -11,7 +11,7 @@ __global__ void BellmanFord_cuda(int V, int E, int *offsets, int *edge_dests, do
 	//int my_vert = blockIdx.x;
 	int my_vert = blockIdx.x *blockDim.x + threadIdx.x;
 
-	if(my_vert <V) {
+	if(my_vert < V) {
 		int source_vert;
 
 		double my_dist = path_weights[my_vert];
@@ -35,7 +35,7 @@ __global__ void BellmanFord_cuda(int V, int E, int *offsets, int *edge_dests, do
 }
 
 double CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight){
-	int num_threads = V;
+	int num_blocks = (V / threads_per_block) + 1;
 
 	//Initialize predecessor tree
 	predecessors.clear();
@@ -78,11 +78,11 @@ double CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, s
 	cudaMemcpy(d_predecessors, (int *) &predecessors[0], predecessors_size, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_path_weight, (double *) &path_weight[0], path_weight_size, cudaMemcpyHostToDevice);
 
-	std::cout<<"Running kernel"<<std::endl;
+	std::cout<<"Running kernel with <<<" << num_blocks << ", " << threads_per_block << ">>>" <<std::endl;
 	boost::timer::cpu_timer timer;
 	for(int iter=0; iter<V; iter++){
-		std::cout<<iter<<std::endl;
-		BellmanFord_cuda<<<2,512>>>(V, E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_path_weight);
+		//std::cout<<iter<<std::endl;
+		BellmanFord_cuda<<<num_blocks, threads_per_block>>>(V, E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_path_weight);
 		cudaDeviceSynchronize();
 	}
 	timer.stop();

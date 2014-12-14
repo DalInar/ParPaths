@@ -31,7 +31,7 @@ bool operator<(const Vertex &a, const Vertex &b);
 class CSR_Graph
 {
 public:
-	CSR_Graph(): V(0),E(0),max_weight(0) {}
+	CSR_Graph(): V(0),E(0),max_weight(0), threads_per_block(1) {}
 	CSR_Graph(int V_, int E_);	//Generate random graph with all weights=1
 	CSR_Graph(int V_, int E_, double max_weight_); //Generate random graph with random weights, bounded by max_weight
 	CSR_Graph(std::string filename);
@@ -47,6 +47,8 @@ public:
 	bool validate(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
 	double get_edge_weight(int source_, int dest_);
 
+	void set_threads_per_block(int threads_per_block_) {threads_per_block = threads_per_block_;}
+
 	bool test_cuda();
 
 
@@ -57,6 +59,8 @@ private:
 	std::vector <int> offsets;
 	std::vector <int> edge_dests;
 	std::vector <double> weights;
+
+	int threads_per_block;
 };
 
 #endif /* CSR_GRAPH_H_ */
