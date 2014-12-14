@@ -13,7 +13,8 @@ __global__ void BellmanFord_atomiccuda(int V, int E, int *offsets, int *edge_des
 
 	if(my_vert < V) {
 		int my_dist;
-		int first_target_index, last_target_index, target_index, target, new_dist;
+		int first_target_index, last_target_index, target_index, target;
+		double new_dist;
 		my_dist = path_weights[my_vert];
 
 		//Find bounds of adjacency list
