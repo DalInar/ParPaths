@@ -35,7 +35,7 @@ __global__ void BellmanFord_cuda(int V, int E, int *offsets, int *edge_dests, do
 }
 
 double CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight){
-	int num_blocks = (V / threads_per_block) + 1;
+	int num_blocks = (V + 31) / threads_per_block;
 
 	//Initialize predecessor tree
 	predecessors.clear();
