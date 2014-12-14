@@ -30,7 +30,7 @@ __global__ void BellmanFord_cuda(int V, int E, int *offsets, int *edge_dests, do
 	}
 }
 
-void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight){
+double CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight){
 	int num_threads = V;
 
 	//Initialize predecessor tree
@@ -41,6 +41,8 @@ void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std
 	path_weight.resize(V,E*max_weight);
 	predecessors[source_]=source_;
 	path_weight[source_]=0;
+
+	boost::timer::auto_cpu_timer t;
 
 	//GPU pointers
 	int *  d_offsets;
@@ -73,11 +75,13 @@ void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std
 	cudaMemcpy(d_path_weight, (double *) &path_weight[0], path_weight_size, cudaMemcpyHostToDevice);
 
 	std::cout<<"Running kernel"<<std::endl;
+	boost::timer::cpu_timer timer;
 	for(int iter=0; iter<V; iter++){
 		std::cout<<iter<<std::endl;
 		BellmanFord_cuda<<<num_threads,1>>>(V, E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_path_weight);
 		cudaDeviceSynchronize();
 	}
+	timer.stop();
 
 	//Copy results back to host
 	cudaMemcpy((int *) &offsets[0], d_offsets, offsets_size, cudaMemcpyDeviceToHost);
@@ -89,6 +93,8 @@ void CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std
 	//cleanup
 	cudaFree(d_offsets); cudaFree(d_edge_dests); cudaFree(d_weights);
 	cudaFree(d_predecessors); cudaFree(d_path_weight);
+
+	return (double) timer.elapsed().wall / 1000000000.0;
 }
 
 

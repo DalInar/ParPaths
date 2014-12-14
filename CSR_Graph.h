@@ -42,7 +42,7 @@ public:
 	double Dijkstra(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
 	double BellmanFord(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
 
-	void BellmanFordGPU(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
+	double BellmanFordGPU(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
 
 	bool validate(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
 	double get_edge_weight(int source_, int dest_);
