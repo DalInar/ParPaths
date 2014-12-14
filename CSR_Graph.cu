@@ -45,14 +45,14 @@ __global__ void BellmanFord_split2cuda(int V, int E, int *offsets, int *edge_des
 
 	if(my_vert < V){
 		pred_vert = temp_preds[my_vert];
-		if(pred_vert > 0 && pred_vert != my_vert){
+		if(pred_vert >= 0 && pred_vert != my_vert){
 			//Update predecessors
 			preds[my_vert] = pred_vert;
 
 			//Find bounds of adjacency list
-			first_target_index = offsets[my_vert];
-			if(my_vert != V-1){
-				last_target_index = offsets[my_vert+1];
+			first_target_index = offsets[pred_vert];
+			if(pred_vert != V-1){
+				last_target_index = offsets[pred_vert+1];
 			}
 			else{
 				last_target_index = E;
@@ -121,7 +121,7 @@ double CSR_Graph::BellmanFordGPU_Split(int source_, std::vector <int> &predecess
 	std::cout<<"Running kernel with <<<" << num_blocks << ", " << threads_per_block << ">>>" <<std::endl;
 	boost::timer::cpu_timer timer;
 	for(int iter=0; iter<V; iter++){
-		//std::cout<<iter<<std::endl;
+		std::cout<<iter<<std::endl;
 		BellmanFord_split1cuda<<<num_blocks, threads_per_block>>>(V, E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_temp_predecessors,d_path_weight);
 		cudaDeviceSynchronize();
 		BellmanFord_split2cuda<<<num_blocks, threads_per_block>>>(V, E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_temp_predecessors,d_path_weight);
