@@ -208,7 +208,7 @@ double CSR_Graph::Dijkstra(int source, std::vector <int> &predecessors, std::vec
 	timer.stop();
 	timer.elapsed().wall;
 	const boost::timer::nanosecond_type oneSecond(1000000000LL);
-	return timer.elapsed().wall / oneSecond;
+	return (double) timer.elapsed().wall / 1000000000.0;
 }
 
 double CSR_Graph::get_edge_weight(int source_, int dest_){
