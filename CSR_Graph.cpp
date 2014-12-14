@@ -23,6 +23,8 @@ CSR_Graph::CSR_Graph(std::string filename):V(0),E(0),max_weight(-1), threads_per
 	input >> E;
 	input >> max_weight;
 
+	threads_per_block = V;
+
 	std::string data;
 	std::getline(input, data);
 
@@ -60,7 +62,7 @@ CSR_Graph::CSR_Graph(std::string filename):V(0),E(0),max_weight(-1), threads_per
 	input.close();
 }
 
-CSR_Graph::CSR_Graph(int V_, int E_, double max_weight_):V(V_),E(E_),max_weight(max_weight_), threads_per_block(1) {
+CSR_Graph::CSR_Graph(int V_, int E_, double max_weight_):V(V_),E(E_),max_weight(max_weight_), threads_per_block(V_) {
 	srand (time(NULL));
 
 	//Temporary adjacency matrix to assist in creating random graph
