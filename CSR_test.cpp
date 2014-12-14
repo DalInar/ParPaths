@@ -12,9 +12,9 @@
 int main(){
 	std::cout<<"Hello!"<<std::endl;
 	int V=10;
-	CSR_Graph G = CSR_Graph(V,15,12.3);
-	G.print_graph();
-
+//	CSR_Graph G = CSR_Graph(V,15,12.3);
+//	G.print_graph();
+//
 	int source=2;
 	std::vector <int> predecessors;
 	std::vector <double> path_weight;
@@ -22,15 +22,15 @@ int main(){
 	std::vector <double> path_weight_BF;
 	std::vector <int> predecessors_BF_gpu;
 	std::vector <double> path_weight_BF_gpu;
-	G.Dijkstra(source, predecessors, path_weight);
-	G.BellmanFord(source, predecessors_BF, path_weight_BF);
-	G.BellmanFordGPU(source, predecessors_BF_gpu, path_weight_BF_gpu);
-
-	std::cout<<"Dijkstra SSSP Valid: "<<G.validate(source, predecessors, path_weight)<<std::endl;
-	std::cout<<"Bellman-Ford SSSP Valid: "<<G.validate(source, predecessors_BF, path_weight_BF)<<std::endl;
-	std::cout<<"Bellman-Ford GPU SSSP Valid: "<<G.validate(source, predecessors_BF_gpu, path_weight_BF_gpu)<<std::endl;
-	std::cout<<"Does Dijkstra equal Bellman-Ford? "<< ((predecessors==predecessors_BF) && (path_weight== path_weight_BF)) << std::endl;
-	std::cout<<"Does Dijkstra equal Bellman-Ford GPU? "<< (predecessors==predecessors_BF_gpu) << std::endl;
+//	G.Dijkstra(source, predecessors, path_weight);
+//	G.BellmanFord(source, predecessors_BF, path_weight_BF);
+//	G.BellmanFordGPU(source, predecessors_BF_gpu, path_weight_BF_gpu);
+//
+//	std::cout<<"Dijkstra SSSP Valid: "<<G.validate(source, predecessors, path_weight)<<std::endl;
+//	std::cout<<"Bellman-Ford SSSP Valid: "<<G.validate(source, predecessors_BF, path_weight_BF)<<std::endl;
+//	std::cout<<"Bellman-Ford GPU SSSP Valid: "<<G.validate(source, predecessors_BF_gpu, path_weight_BF_gpu)<<std::endl;
+//	std::cout<<"Does Dijkstra equal Bellman-Ford? "<< ((predecessors==predecessors_BF) && (path_weight== path_weight_BF)) << std::endl;
+//	std::cout<<"Does Dijkstra equal Bellman-Ford GPU? "<< (predecessors==predecessors_BF_gpu) << std::endl;
 //	for(int i=0; i<V; i++){
 //		std::cout<<"V: "<<i<<"\t Pred:"<<predecessors_BF[i]<<"\t W:"<<path_weight_BF[i]<<std::endl;
 //	}
@@ -55,11 +55,16 @@ int main(){
 
 	std::ofstream GPU_time;
 	GPU_time.open("BF_GPU_Time.txt");
-	int threads_per_block = 32;
+	int threads_per_block = 1;
 	while(threads_per_block < (V+31) ){
 		G_gpu.set_threads_per_block(threads_per_block);
 		GPU_time<<threads_per_block<<"\t"<<G_gpu.BellmanFordGPU(source, predecessors_BF_gpu, path_weight_BF_gpu)<<std::endl;
-		threads_per_block += 32;
+		if(threads_per_block ==1){
+			threads_per_block = 1;
+		}
+		else{
+			threads_per_block += 32;
+		}
 	}
 	GPU_time.close();
 

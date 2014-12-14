@@ -11,7 +11,7 @@ __global__ void BellmanFord_cuda(int V, int E, int *offsets, int *edge_dests, do
 	//int my_vert = blockIdx.x;
 	int my_vert = blockIdx.x *blockDim.x + threadIdx.x;
 
-	if(my_vert < V) {
+	//if(my_vert < V) {
 		int source_vert;
 
 		double my_dist = path_weights[my_vert];
@@ -31,7 +31,7 @@ __global__ void BellmanFord_cuda(int V, int E, int *offsets, int *edge_dests, do
 				}
 			}
 		}
-	}
+//	}
 }
 
 double CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight){
@@ -82,7 +82,7 @@ double CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, s
 	boost::timer::cpu_timer timer;
 	for(int iter=0; iter<V; iter++){
 		//std::cout<<iter<<std::endl;
-		BellmanFord_cuda<<<num_blocks, threads_per_block>>>(V, E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_path_weight);
+		BellmanFord_cuda<<<1, V>>>(V, E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_path_weight);
 		cudaDeviceSynchronize();
 	}
 	timer.stop();
