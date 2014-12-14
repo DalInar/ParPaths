@@ -46,11 +46,6 @@ int main(){
 
 	std::cout<<"Dijkstra time: "<<G_gpu.Dijkstra(source, predecessors, path_weight)<<std::endl;
 	std::cout<<"Size = "<<predecessors.size()<<std::endl;
-	for(int i=0; i < V; i++){
-			std::cout<<"V: "<<i<<std::endl;
-			std::cout<<"Pred: "<< predecessors[i]<<"\t"<<predecessors_BF_gpu[i]<<std::endl;
-			std::cout<<"PW: "<<path_weight[i]<<"\t"<<path_weight_BF_gpu[i]<<std::endl;
-	}
 
 	std::cout<<"Bellman-Ford GPU time: "<<G_gpu.BellmanFordGPU_Split(source, predecessors_BF_gpu, path_weight_BF_gpu)<<std::endl;
 	std::cout<<"Dijkstra SSSP Valid: "<<G_gpu.validate(source, predecessors, path_weight)<<std::endl;
