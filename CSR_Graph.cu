@@ -8,23 +8,27 @@
 #include "CSR_Graph.h"
 
 __global__ void BellmanFord_cuda(int V, int E, int *offsets, int *edge_dests, double *weights, int * preds, double * path_weights){
-	int my_vert = blockIdx.x;
-	int source_vert;
+	//int my_vert = blockIdx.x;
+	int my_vert = blockIdx.x *blockDim.x + threadIdx.x;
 
-	double my_dist = path_weights[my_vert];
-	double trial_dist;
+	if(my_vert <V) {
+		int source_vert;
 
-	source_vert=0;
-	for(int i=0; i<E; i++){
-		if(edge_dests[i] == my_vert){
-			//we can keep track of what the source vertex could be, since the edge list is sorted by them
-			while(source_vert != V-1  && offsets[source_vert+1] <= i){
-				source_vert++;
-			}
-			trial_dist = weights[i] + path_weights[source_vert]; //Data race, possibly benign?
-			if(trial_dist < my_dist){
-				path_weights[my_vert] = trial_dist;
-				preds[my_vert] = source_vert;
+		double my_dist = path_weights[my_vert];
+		double trial_dist;
+
+		source_vert=0;
+		for(int i=0; i<E; i++){
+			if(edge_dests[i] == my_vert){
+				//we can keep track of what the source vertex could be, since the edge list is sorted by them
+				while(source_vert != V-1  && offsets[source_vert+1] <= i){
+					source_vert++;
+				}
+				trial_dist = weights[i] + path_weights[source_vert]; //Data race, possibly benign?
+				if(trial_dist < my_dist){
+					path_weights[my_vert] = trial_dist;
+					preds[my_vert] = source_vert;
+				}
 			}
 		}
 	}
@@ -78,7 +82,7 @@ double CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, s
 	boost::timer::cpu_timer timer;
 	for(int iter=0; iter<V; iter++){
 		std::cout<<iter<<std::endl;
-		BellmanFord_cuda<<<1,num_threads>>>(V, E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_path_weight);
+		BellmanFord_cuda<<<2,512>>>(V, E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_path_weight);
 		cudaDeviceSynchronize();
 	}
 	timer.stop();
