@@ -96,8 +96,7 @@ CSR_Graph::CSR_Graph(int V_, int E_, double max_weight_):V(V_),E(E_),max_weight(
 	}
 }
 
-void CSR_Graph::BellmanFord(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight){
-	std::clock_t start;
+double CSR_Graph::BellmanFord(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight){
 	std::cout<<"Finding shortest paths from V: "<<source_<<" with Bellman-Ford"<<std::endl;
 	predecessors.clear();
 	path_weight.clear();
@@ -110,8 +109,8 @@ void CSR_Graph::BellmanFord(int source_, std::vector <int> &predecessors, std::v
 
 	int first_target_index, last_target_index, v;
 	double edge_weight,u_dist;
-	start=std::clock();
 	boost::timer::auto_cpu_timer t;
+	boost::timer::cpu_timer timer;
 	for(int i=0; i<V; i++){
 		for(int u=0; u<V; u++){
 			//Cycle through adjacency list of vertex u
@@ -135,7 +134,8 @@ void CSR_Graph::BellmanFord(int source_, std::vector <int> &predecessors, std::v
 			}
 		}
 	}
-	std::cout << "Bellman-Ford Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+	timer.stop();
+	return (double) timer.elapsed().wall / 1000000000.0;
 }
 
 double CSR_Graph::Dijkstra(int source, std::vector <int> &predecessors, std::vector <double> &path_weight) {
@@ -203,11 +203,8 @@ double CSR_Graph::Dijkstra(int source, std::vector <int> &predecessors, std::vec
 				path_weight[d_vert] = c_dist+edge_weight;
 			}
 		}
-
 	}
 	timer.stop();
-	timer.elapsed().wall;
-	const boost::timer::nanosecond_type oneSecond(1000000000LL);
 	return (double) timer.elapsed().wall / 1000000000.0;
 }
 

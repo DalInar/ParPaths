@@ -40,7 +40,7 @@ public:
 	bool print_graph_to_file(std::string filename);
 
 	double Dijkstra(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
-	void BellmanFord(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
+	double BellmanFord(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
 
 	void BellmanFordGPU(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
 

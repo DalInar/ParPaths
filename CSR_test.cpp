@@ -36,7 +36,7 @@ int main(){
 	CSR_Graph G_gpu = CSR_Graph(V,100000,12.3);
 	//G_gpu.print_graph();
 	G_gpu.print_graph_to_file(filename);
-	G_gpu.BellmanFordGPU(source, predecessors_BF, path_weight_BF);
+	std::cout<<"Bellman-Ford time: "<<G_gpu.BellmanFord(source, predecessors_BF, path_weight_BF)<<std::endl;
 	std::cout<<"Dijkstra time: "<<G_gpu.Dijkstra(source, predecessors, path_weight)<<std::endl;
 
 	std::cout<<"Are they equal? "<< ((predecessors==predecessors_BF) && (path_weight== path_weight_BF)) << std::endl;
