@@ -7,10 +7,109 @@
 
 #include "CSR_Graph.h"
 
+__global__ void BellmanFord_atomiccuda(int V, int E, int *offsets, int *edge_dests, double *weights, int * preds, double * path_weights){
+	//int my_vert = blockIdx.x;
+	int my_vert = blockIdx.x *blockDim.x + threadIdx.x;
+
+	if(my_vert < V) {
+		int my_dist;
+		int first_target_index, last_target_index, target_index, target, new_dist;
+		my_dist = path_weights[my_vert];
+
+		//Find bounds of adjacency list
+		first_target_index = offsets[my_vert];
+		if(my_vert != V-1){
+			last_target_index = offsets[my_vert+1];
+		}
+		else{
+			last_target_index = E;
+		}
+
+		for(target_index = first_target_index; target_index < last_target_index; target_index++){
+			target = edge_dests[target_index];
+			new_dist = my_dist + weights[target_index];
+			atomicMin(&path_weights[target], new_dist);
+		}
+	}
+}
+
+double CSR_Graph::BellmanFordAtomicGPU(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight){
+	int num_blocks = (V + threads_per_block - 1) / threads_per_block;
+
+	//Initialize predecessor tree
+	predecessors.clear();
+	path_weight.clear();
+	double inf = std::numeric_limits<double>::infinity();
+	predecessors.resize(V,-1);
+	path_weight.resize(V,E*max_weight);
+	predecessors[source_]=source_;
+	path_weight[source_]=0;
+
+	boost::timer::auto_cpu_timer t;
+
+	//GPU pointers
+	int *  d_offsets;
+	int * d_edge_dests;
+	double * d_weights;
+	int * d_predecessors;
+	double * d_path_weight;
+
+	//Size of CSR graph
+	int offsets_size = V*sizeof(int);
+	int edge_dests_size = E*sizeof(int);
+	int weights_size = E*sizeof(double);
+
+	//Size of predecessor tree into
+	int predecessors_size = V*sizeof(int);
+	int path_weight_size = V*sizeof(double);
+
+	//Allocate memory on device
+	cudaMalloc((void **) & d_offsets, offsets_size);
+	cudaMalloc((void **) & d_edge_dests, edge_dests_size);
+	cudaMalloc((void **) & d_weights, weights_size);
+	cudaMalloc((void **) & d_predecessors, predecessors_size);
+	cudaMalloc((void **) & d_path_weight, path_weight_size);
+
+	std::cout<<"Transferring to GPU"<<std::endl;
+	cudaMemcpy(d_offsets, (int *) &offsets[0], offsets_size, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_edge_dests, (int *) &edge_dests[0], edge_dests_size, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_weights, (double *) &weights[0], weights_size, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_predecessors, (int *) &predecessors[0], predecessors_size, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_path_weight, (double *) &path_weight[0], path_weight_size, cudaMemcpyHostToDevice);
+
+	std::cout<<"Running kernel with <<<" << num_blocks << ", " << threads_per_block << ">>>" <<std::endl;
+	boost::timer::cpu_timer timer;
+	for(int iter=0; iter<V; iter++){
+		//std::cout<<iter<<std::endl;
+		BellmanFord_atomiccuda<<<num_blocks, threads_per_block>>>(V, E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_path_weight);
+		cudaDeviceSynchronize();
+	}
+	timer.stop();
+
+	//Copy results back to host
+	cudaMemcpy((int *) &offsets[0], d_offsets, offsets_size, cudaMemcpyDeviceToHost);
+	cudaMemcpy((int *) &edge_dests[0], d_edge_dests, edge_dests_size, cudaMemcpyDeviceToHost);
+	cudaMemcpy((double *) &weights[0], d_weights, weights_size, cudaMemcpyDeviceToHost);
+	cudaMemcpy((int *) &predecessors[0], d_predecessors, predecessors_size, cudaMemcpyDeviceToHost);
+	cudaMemcpy((double *) &path_weight[0], d_path_weight, path_weight_size, cudaMemcpyDeviceToHost);
+
+	//cleanup
+	cudaFree(d_offsets); cudaFree(d_edge_dests); cudaFree(d_weights);
+	cudaFree(d_predecessors); cudaFree(d_path_weight);
+
+	for(int i=0; i<V; i++){
+		if(path_weight[i] == E*max_weight){
+			path_weight[i] = inf;
+		}
+	}
+
+	return (double) timer.elapsed().wall / 1000000000.0;
+}
+
 __global__ void BellmanFord_cuda(int V, int E, int *offsets, int *edge_dests, double *weights, int * preds, double * path_weights){
 	//int my_vert = blockIdx.x;
-	//int my_vert = blockIdx.x *blockDim.x + threadIdx.x;
-	int my_vert = threadIdx.x;
+	int my_vert = blockIdx.x *blockDim.x + threadIdx.x;
+	//int my_vert = threadIdx.x;
 
 	if(my_vert < V) {
 		int source_vert;
@@ -83,7 +182,7 @@ double CSR_Graph::BellmanFordGPU(int source_, std::vector <int> &predecessors, s
 	boost::timer::cpu_timer timer;
 	for(int iter=0; iter<V; iter++){
 		//std::cout<<iter<<std::endl;
-		BellmanFord_cuda<<<1, 1000>>>(V, E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_path_weight);
+		BellmanFord_cuda<<<num_blocks, threads_per_block>>>(V, E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_path_weight);
 		cudaDeviceSynchronize();
 	}
 	timer.stop();

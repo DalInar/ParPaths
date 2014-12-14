@@ -44,9 +44,10 @@ int main(){
 	G_gpu.print_graph_to_file(filename);
 	std::cout<<"Bellman-Ford time: "<<G_gpu.BellmanFord(source, predecessors_BF, path_weight_BF)<<std::endl;
 	std::cout<<"Dijkstra time: "<<G_gpu.Dijkstra(source, predecessors, path_weight)<<std::endl;
-	std::cout<<"Bellman-Ford GPU time: "<<G_gpu.BellmanFordGPU(source, predecessors_BF_gpu, path_weight_BF_gpu)<<std::endl;
+	std::cout<<"Bellman-Ford GPU time: "<<G_gpu.BellmanFordAtomicGPU(source, predecessors_BF_gpu, path_weight_BF_gpu)<<std::endl;
 
-	std::cout<<"Are they equal? "<< (predecessors==predecessors_BF_gpu)<< std::endl;
+	std::cout<<"Are preds equal? "<< (predecessors==predecessors_BF_gpu)<< std::endl;
+	std::cout<<"Are PWs equal? "<< (predecessors==predecessors_BF_gpu)<< std::endl;
 	for(int i=0; i < 5; i++){
 		std::cout<<"V: "<<i<<std::endl;
 		std::cout<<predecessors[i]<<"\t"<<predecessors_BF_gpu[i]<<std::endl;
@@ -58,7 +59,7 @@ int main(){
 	int threads_per_block = 1;
 	while(threads_per_block < (V+31) ){
 		G_gpu.set_threads_per_block(threads_per_block);
-		GPU_time<<threads_per_block<<"\t"<<G_gpu.BellmanFordGPU(source, predecessors_BF_gpu, path_weight_BF_gpu)<<std::endl;
+		GPU_time<<threads_per_block<<"\t"<<G_gpu.BellmanFordAtomicGPU(source, predecessors_BF_gpu, path_weight_BF_gpu)<<std::endl;
 		if(threads_per_block ==1){
 			threads_per_block = 32;
 		}
