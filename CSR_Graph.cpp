@@ -237,7 +237,7 @@ bool CSR_Graph::validate(int source_, std::vector <int> &predecessors, std::vect
 	for(int v=0; v<V; v++){
 		int p=predecessors[v];
 		if(p<0){
-			if(path_weight[v] != std::numeric_limits<double>::infinity()){
+			if(path_weight[v] != std::numeric_limits<double>::infinity() && path_weight[v] != V*max_weight){
 				std::cout<<"Error, vertex "<<v<<" unconnected to source "<<source_<<", but path weight = "<<path_weight[v]<<std::endl;
 				return false;
 			}
