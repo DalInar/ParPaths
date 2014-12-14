@@ -45,7 +45,7 @@ __global__ void BellmanFord_split2cuda(int V, int E, int *offsets, int *edge_des
 
 	if(my_vert < V){
 		pred_vert = temp_preds[my_vert];
-		if(pred_vert > 0){
+		if(pred_vert > 0 && pred_vert != my_vert){
 			//Update predecessors
 			preds[my_vert] = pred_vert;
 
@@ -130,15 +130,15 @@ double CSR_Graph::BellmanFordGPU_Split(int source_, std::vector <int> &predecess
 	timer.stop();
 
 	//Copy results back to host
-	cudaMemcpy((int *) &offsets[0], d_offsets, offsets_size, cudaMemcpyDeviceToHost);
-	cudaMemcpy((int *) &edge_dests[0], d_edge_dests, edge_dests_size, cudaMemcpyDeviceToHost);
-	cudaMemcpy((double *) &weights[0], d_weights, weights_size, cudaMemcpyDeviceToHost);
+	//cudaMemcpy((int *) &offsets[0], d_offsets, offsets_size, cudaMemcpyDeviceToHost);
+	//cudaMemcpy((int *) &edge_dests[0], d_edge_dests, edge_dests_size, cudaMemcpyDeviceToHost);
+	//cudaMemcpy((double *) &weights[0], d_weights, weights_size, cudaMemcpyDeviceToHost);
 	cudaMemcpy((int *) &predecessors[0], d_predecessors, predecessors_size, cudaMemcpyDeviceToHost);
 	cudaMemcpy((double *) &path_weight[0], d_path_weight, path_weight_size, cudaMemcpyDeviceToHost);
 
 	//cleanup
 	cudaFree(d_offsets); cudaFree(d_edge_dests); cudaFree(d_weights);
-	cudaFree(d_predecessors); cudaFree(d_path_weight);
+	cudaFree(d_predecessors); cudaFree(d_path_weight); cudaFree(d_temp_predecessors);
 
 	for(int i=0; i<V; i++){
 		if(path_weight[i] == E*max_weight){

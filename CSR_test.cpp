@@ -45,13 +45,14 @@ int main(){
 	//std::cout<<"Bellman-Ford time: "<<G_gpu.BellmanFord(source, predecessors_BF, path_weight_BF)<<std::endl;
 	std::cout<<"Dijkstra time: "<<G_gpu.Dijkstra(source, predecessors, path_weight)<<std::endl;
 	std::cout<<"Bellman-Ford GPU time: "<<G_gpu.BellmanFordGPU_Split(source, predecessors_BF_gpu, path_weight_BF_gpu)<<std::endl;
+	std::cout<<"Dijkstra SSSP Valid: "<<G_gpu.validate(source, predecessors, path_weight)<<std::endl;
 
 	std::cout<<"Are preds equal? "<< (predecessors==predecessors_BF_gpu)<< std::endl;
 	std::cout<<"Are PWs equal? "<< (predecessors==predecessors_BF_gpu)<< std::endl;
 	for(int i=0; i < 100; i++){
 		std::cout<<"V: "<<i<<std::endl;
-		std::cout<<predecessors[i]<<"\t"<<predecessors_BF_gpu[i]<<std::endl;
-		std::cout<<path_weight[i]<<"\t"<<path_weight_BF_gpu[i]<<std::endl;
+		std::cout<<"Pred: "<< predecessors[i]<<"\t"<<predecessors_BF_gpu[i]<<std::endl;
+		std::cout<<"PW: "<<path_weight[i]<<"\t"<<path_weight_BF_gpu[i]<<std::endl;
 	}
 
 	std::ofstream GPU_time;

@@ -149,7 +149,7 @@ double CSR_Graph::Dijkstra(int source, std::vector <int> &predecessors, std::vec
 	path_weight.resize(V,inf);
 
 	//Keep track of where each vertex is in Q
-	std::vector<std::multiset<Vertex>::iterator> v_iters(V);
+	std::vector< std::multiset<Vertex>::iterator > v_iters(V);
 
 	boost::timer::auto_cpu_timer t;
 	boost::timer::cpu_timer timer;
