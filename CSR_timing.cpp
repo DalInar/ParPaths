@@ -5,6 +5,14 @@
 
 int main(){
 	std::vector <int> scales;
+	std::vector <int> num_vert;
+	num_vert.push_back(10);
+	num_vert.push_back(100);
+	num_vert.push_back(1000);
+	num_vert.push_back(10000);
+	num_vert.push_back(100000);
+	num_vert.push_back(1000000);
+
 
 	scales.push_back(1);
 	scales.push_back(10);
@@ -31,7 +39,8 @@ int main(){
 		output<<"#V \t E \t BF \t Dij \t BF GPU \t BF GPU SPLIT"<<std::endl;
 
 		std::cout<<scale<<std::endl;
-		for(V=100; V<=10100; V=V+1000){
+		for(int j=0; j<num_vert.size(); j++){
+			V=num_vert[j];
 			E=(scale/100.0)*V*V;
 			CSR_Graph G_temp = CSR_Graph(V,E,100);
 			G_temp.set_threads_per_block(64);
