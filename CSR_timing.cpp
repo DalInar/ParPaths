@@ -27,12 +27,12 @@ int main(){
 		std::ofstream output;
 		output.open(fileName.c_str());
 
-		output<<"# 100 * scale% = "<<scale<<std::endl;
+		output<<"#scale% = "<<scale<<std::endl;
 		output<<"#V \t E \t BF \t Dij \t BF GPU \t BF GPU SPLIT"<<std::endl;
 
 		std::cout<<scale<<std::endl;
 		for(V=100; V<=10100; V=V+1000){
-			E=scale*V*V;
+			E=(scale/100.0)*V*V;
 			CSR_Graph G_temp = CSR_Graph(V,E,100);
 			G_temp.set_threads_per_block(64);
 
