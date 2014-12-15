@@ -38,8 +38,8 @@ int main(){
 	std::cout<<std::endl<<"New tests:"<<std::endl;
 
 	std::string filename = "output.txt";
-	V=6;
-	CSR_Graph G_gpu = CSR_Graph(V,10,12.3);
+	V=1000;
+	CSR_Graph G_gpu = CSR_Graph(V,10000,12.3);
 	G_gpu.print_graph();
 	G_gpu.print_graph_to_file(filename);
 
