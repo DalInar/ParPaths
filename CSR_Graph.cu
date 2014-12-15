@@ -45,6 +45,7 @@ __global__ void BellmanFord_split1cuda(int * finished, int V, int E, int *offset
 			// Try to make this atomic
 			if(new_dist < atomicMin(&temp_path_weights[target], new_dist) ){
 				temp_preds[target] = my_vert;
+				preds[target] = my_vert;
 				*finished = 0;
 				//temp_path_weights[target] = new_dist;
 			}
