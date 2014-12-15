@@ -161,7 +161,7 @@ double CSR_Graph::BellmanFordGPU_Split(int source_, std::vector <int> &predecess
 
 		cudaMemcpy(&finished, d_finished,  sizeof(int), cudaMemcpyDeviceToHost);
 //		BellmanFord_split2cuda<<<num_blocks, threads_per_block>>>(V, E, d_offsets,d_edge_dests,
-				d_weights,d_predecessors,d_temp_predecessors,d_path_weight, d_temp_path_weight);
+//				d_weights,d_predecessors,d_temp_predecessors,d_path_weight, d_temp_path_weight);
 //		cudaDeviceSynchronize();
 
 		cudaMemcpy(d_path_weight, d_temp_path_weight, path_weight_size, cudaMemcpyDeviceToDevice);
