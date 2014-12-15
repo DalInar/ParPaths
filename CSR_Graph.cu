@@ -31,7 +31,7 @@ __global__ void BellmanFord_split1cuda(int * finished, int V, int E, int *offset
 			new_dist = my_dist + weights[target_index];
 			// need to change path_weights[target] and update predecessors[target]
 			if(new_dist < path_weights[target]){
-				finished = 0;
+				*finished = 0;
 				temp_preds[target] = my_vert;
 			}
 		}
@@ -131,7 +131,7 @@ double CSR_Graph::BellmanFordGPU_Split(int source_, std::vector <int> &predecess
 	boost::timer::cpu_timer timer;
 //	for(int iter=0; iter<V; iter++){
 	while(finished == 0) {
-		std::cout<<iter<<std::endl;
+		std::cout<<"Iter = "<<iter<<std::endl;
 		finished=1;
 		cudaMemcpy(d_finished, &finished, sizeof(int), cudaMemcpyHostToDevice);
 		cudaDeviceSynchronize();
