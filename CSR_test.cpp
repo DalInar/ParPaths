@@ -86,17 +86,20 @@ int main(){
 
 	double scale = 0.8;
 	serial_time<<"# scale = "<<scale<<std::endl;
-	serial_time<<"#V \t E \t BF \t Dij"<<std::endl;
-	for(V=100; V<=10100; V=V+500){
+	serial_time<<"#V \t E \t BF \t Dij \t BF GPU \t BF GPU SPLIT"<<std::endl;
+	for(V=100; V<=10100; V=V+1000){
 		E=scale*V*V;
 		CSR_Graph G_temp = CSR_Graph(V,E,100);
+		G_temp.set_threads_per_block(64);
 
 		std::cout<<V<<"\t"<<E<<std::endl;
 
 		serial_time<<V<<"\t"<<E<<"\t";
 
 		serial_time << G_temp.BellmanFord(serial_source, serial_preds, serial_path_weights) <<"\t";
-		serial_time << G_temp.Dijkstra(serial_source, serial_preds, serial_path_weights) << std::endl;
+		serial_time << G_temp.Dijkstra(serial_source, serial_preds, serial_path_weights) << "\t";
+		serial_time << G_temp.BellmanFordGPU(serial_source, serial_preds, serial_path_weights) <<"\t";
+		serial_time << G_temp.BellmanFordGPU_Split(serial_source, serial_preds, serial_path_weights) <<std::endl;
 	}
 
 
