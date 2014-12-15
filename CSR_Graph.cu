@@ -24,7 +24,7 @@ __global__ void BellmanFord_split1cuda(int * finished, int V, int E, int *offset
 	int my_vert = blockIdx.x *blockDim.x + threadIdx.x;
 
 	if(my_vert < V) {
-		int my_dist;
+		double my_dist;
 		int first_target_index, last_target_index, target_index, target;
 		double new_dist;
 		my_dist = path_weights[my_vert];
