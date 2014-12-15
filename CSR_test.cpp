@@ -61,7 +61,7 @@ int main(){
 	std::ofstream GPU_time;
 	GPU_time.open("BF_GPU_Time.txt");
 	int threads_per_block = 1;
-	while(threads_per_block < (V+31) ){
+	while(threads_per_block < (V+31) && threads_per_block <= 1024){
 		G_gpu.set_threads_per_block(threads_per_block);
 		GPU_time<<threads_per_block<<"\t"<<G_gpu.BellmanFordGPU_Split(source, predecessors_BF_gpu, path_weight_BF_gpu)<<std::endl;
 		if(threads_per_block ==1){
