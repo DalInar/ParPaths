@@ -49,7 +49,7 @@ public:
 	bool validate(int source_, std::vector <int> &predecessors, std::vector <double> &path_weight);
 	double get_edge_weight(int source_, int dest_);
 
-	void set_threads_per_block(int threads_per_block_) {threads_per_block = threads_per_block_;}
+	int set_threads_per_block(int threads_per_block_);
 
 	bool test_cuda();
 

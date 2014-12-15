@@ -11,7 +11,7 @@ bool operator<(const Vertex &a, const Vertex &b){
 	return (a.dist < b.dist) && (a.idx != b.idx);
 }
 
-CSR_Graph::CSR_Graph(std::string filename):V(0),E(0),max_weight(-1), threads_per_block(1){
+CSR_Graph::CSR_Graph(std::string filename):V(0),E(0),max_weight(-1){
 	std::ifstream input;
 	input.open(filename.c_str());
 	if(!input.is_open()){
@@ -23,7 +23,7 @@ CSR_Graph::CSR_Graph(std::string filename):V(0),E(0),max_weight(-1), threads_per
 	input >> E;
 	input >> max_weight;
 
-	threads_per_block = V;
+	set_threads_per_block(V);
 
 	std::string data;
 	std::getline(input, data);
@@ -62,8 +62,10 @@ CSR_Graph::CSR_Graph(std::string filename):V(0),E(0),max_weight(-1), threads_per
 	input.close();
 }
 
-CSR_Graph::CSR_Graph(int V_, int E_, double max_weight_):V(V_),E(E_),max_weight(max_weight_), threads_per_block(V_) {
+CSR_Graph::CSR_Graph(int V_, int E_, double max_weight_):V(V_),E(E_),max_weight(max_weight_) {
 	srand (time(NULL));
+
+	set_threads_per_block(V);
 
 	//Temporary adjacency matrix to assist in creating random graph
 	std::vector< std::vector<double> > Adj(V, std::vector<double>(V));
@@ -354,6 +356,16 @@ bool CSR_Graph::print_graph_to_file(std::string filename){
 
 	output.close();
 	return true;
+}
+
+int CSR_Graph::set_threads_per_block(int threads_per_block_) {
+	if(threads_per_block_ <= 1024){
+		threads_per_block= threads_per_block_;
+	}
+	else{
+		threads_per_block= 1024;
+	}
+	return threads_per_block;
 }
 
 
