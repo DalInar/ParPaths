@@ -83,7 +83,7 @@ double CSR_Graph::BellmanFordGPU_Split(int source_, std::vector <int> &predecess
 	path_weight.resize(V,E*max_weight);
 	predecessors[source_]=source_;
 	path_weight[source_]=0;
-	int finished=0;
+	int finished;
 
 	boost::timer::auto_cpu_timer t;
 
@@ -126,6 +126,8 @@ double CSR_Graph::BellmanFordGPU_Split(int source_, std::vector <int> &predecess
 
 
 	std::cout<<"Running kernel with <<<" << num_blocks << ", " << threads_per_block << ">>>" <<std::endl;
+	int iter=0;
+	finished=0;
 	boost::timer::cpu_timer timer;
 //	for(int iter=0; iter<V; iter++){
 	while(finished == 0) {
