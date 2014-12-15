@@ -20,8 +20,8 @@ int main(){
 	int V,E;
 	for(int i=0; i<scales.size(); i++){
 		scale = scales[i];
-		std::ostringstream fileNameStream("CSR_timing_scale_");
-		fileNameStream << scale << ".txt";
+		std::ostringstream fileNameStream;
+		fileNameStream << "CSR_timing_scale_"<< scale << ".txt";
 		std::string fileName = fileNameStream.str();
 
 		std::ofstream output;
