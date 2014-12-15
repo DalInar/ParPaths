@@ -147,26 +147,36 @@ double CSR_Graph::BellmanFordGPU_Split(int source_, std::vector <int> &predecess
 	finished=0;
 	boost::timer::cpu_timer timer;
 //	for(int iter=0; iter<V; iter++){
-	while(finished == 0 && iter < 100) {
+	while(finished == 0 && iter < 200) {
 		std::cout<<"Iter = "<<iter<<std::endl;
 		finished=1;
+		std::cout<<finished<<std::endl;
+
 		cudaMemcpy(d_finished, &finished, sizeof(int), cudaMemcpyHostToDevice);
 		cudaDeviceSynchronize();
+
 		BellmanFord_split1cuda<<<num_blocks, threads_per_block>>>(d_finished, V, E, d_offsets,d_edge_dests,
 				d_weights,d_predecessors,d_temp_predecessors,d_path_weight, d_temp_path_weight);
 		cudaDeviceSynchronize();
+
 		cudaMemcpy(&finished, d_finished,  sizeof(int), cudaMemcpyDeviceToHost);
 		BellmanFord_split2cuda<<<num_blocks, threads_per_block>>>(V, E, d_offsets,d_edge_dests,
 				d_weights,d_predecessors,d_temp_predecessors,d_path_weight, d_temp_path_weight);
 		cudaDeviceSynchronize();
-		temp=d_path_weight;
-		d_path_weight = d_temp_path_weight;
-		d_temp_path_weight = temp;
+
+		cudaMemcpy(d_path_weight, d_temp_path_weight, path_weight_size, cudaMemcpuDeviceToDevice);
+		cudaDeviceSynchronize();
+
+		std::cout<<finished<<std::endl;
+
+//		temp=d_path_weight;
+//		d_path_weight = d_temp_path_weight;
+//		d_temp_path_weight = temp;
 
 		iter++;
 	}
 //	}
-	std::cout<<finished<<std::endl;
+
 	timer.stop();
 
 	//Copy results back to host
