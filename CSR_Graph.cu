@@ -45,7 +45,7 @@ __global__ void BellmanFord_split1cuda(int * finished, int V, int E, int *offset
 			// Try to make this atomic
 			if(new_dist < atomicMin(&temp_path_weights[target], new_dist) ){
 				temp_preds[target] = my_vert;
-				preds[target] = my_vert;
+				//preds[target] = my_vert;
 				*finished = 0;
 				//temp_path_weights[target] = new_dist;
 			}
@@ -147,7 +147,7 @@ double CSR_Graph::BellmanFordGPU_Split(int source_, std::vector <int> &predecess
 	finished=0;
 	boost::timer::cpu_timer timer;
 //	for(int iter=0; iter<V; iter++){
-	while(finished == 0 && iter < 200) {
+	while(finished == 0 && iter < E) {
 		std::cout<<"Iter = "<<iter<<std::endl;
 		finished=1;
 		std::cout<<finished<<std::endl;
@@ -160,9 +160,9 @@ double CSR_Graph::BellmanFordGPU_Split(int source_, std::vector <int> &predecess
 		cudaDeviceSynchronize();
 
 		cudaMemcpy(&finished, d_finished,  sizeof(int), cudaMemcpyDeviceToHost);
-//		BellmanFord_split2cuda<<<num_blocks, threads_per_block>>>(V, E, d_offsets,d_edge_dests,
-//				d_weights,d_predecessors,d_temp_predecessors,d_path_weight, d_temp_path_weight);
-//		cudaDeviceSynchronize();
+		BellmanFord_split2cuda<<<num_blocks, threads_per_block>>>(V, E, d_offsets,d_edge_dests,
+				d_weights,d_predecessors,d_temp_predecessors,d_path_weight, d_temp_path_weight);
+		cudaDeviceSynchronize();
 
 		cudaMemcpy(d_path_weight, d_temp_path_weight, path_weight_size, cudaMemcpyDeviceToDevice);
 		cudaDeviceSynchronize();
@@ -170,9 +170,9 @@ double CSR_Graph::BellmanFordGPU_Split(int source_, std::vector <int> &predecess
 		cudaMemcpy((double *) &path_weight[0], d_path_weight, path_weight_size, cudaMemcpyDeviceToHost);
 		cudaDeviceSynchronize();
 
-		for(int i=0; i<V; i++) {
-			std::cout<<"V: "<<i<<",\t PW: "<<path_weight[i]<<std::endl;
-		}
+//		for(int i=0; i<V; i++) {
+//			std::cout<<"V: "<<i<<",\t PW: "<<path_weight[i]<<std::endl;
+//		}
 
 		std::cout<<finished<<std::endl;
 
