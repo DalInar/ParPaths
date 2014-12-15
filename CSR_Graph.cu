@@ -76,7 +76,6 @@ __global__ void BellmanFord_split2cuda(int V, int E, int *offsets, int *edge_des
 			//Update path_weights
 			for(int i=first_target_index; i < last_target_index; i++){
 				if(edge_dests[i] == my_vert){
-					//Data race?
 					temp_path_weights[my_vert] = path_weights[pred_vert] + weights[i];
 					break;
 				}
@@ -166,6 +165,13 @@ double CSR_Graph::BellmanFordGPU_Split(int source_, std::vector <int> &predecess
 
 		cudaMemcpy(d_path_weight, d_temp_path_weight, path_weight_size, cudaMemcpyDeviceToDevice);
 		cudaDeviceSynchronize();
+
+		cudaMemcpy((double *) &path_weight[0], d_path_weight, path_weight_size, cudaMemcpyDeviceToHost);
+		cudaDeviceSynchronize();
+
+		for(int i=0; i<V; i++) {
+			std::cout<<"V: "<<i<<",\t PW: "<<path_weight[i]<<std::endl;
+		}
 
 		std::cout<<finished<<std::endl;
 
