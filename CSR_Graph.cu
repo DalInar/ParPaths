@@ -130,7 +130,7 @@ double CSR_Graph::BellmanFordGPU_Split(int source_, std::vector <int> &predecess
 	finished=0;
 	boost::timer::cpu_timer timer;
 //	for(int iter=0; iter<V; iter++){
-	while(finished == 0) {
+	while(finished == 0 && iter < 100) {
 		std::cout<<"Iter = "<<iter<<std::endl;
 		finished=1;
 		cudaMemcpy(d_finished, &finished, sizeof(int), cudaMemcpyHostToDevice);
@@ -140,6 +140,7 @@ double CSR_Graph::BellmanFordGPU_Split(int source_, std::vector <int> &predecess
 		cudaMemcpy(&finished, d_finished,  sizeof(int), cudaMemcpyDeviceToHost);
 		BellmanFord_split2cuda<<<num_blocks, threads_per_block>>>(V, E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_temp_predecessors,d_path_weight);
 		cudaDeviceSynchronize();
+		std::cout<<finished<<std::endl;
 		iter++;
 	}
 //	}
