@@ -84,12 +84,14 @@ int main(){
 	std::vector <int> serial_preds;
 	std::vector <double> serial_path_weights;
 
-	double scale = 0.2;
+	double scale = 0.8;
 	serial_time<<"# scale = "<<scale<<std::endl;
 	serial_time<<"#V \t E \t BF \t Dij"<<std::endl;
 	for(V=100; V<=10100; V=V+500){
 		E=scale*V*V;
 		CSR_Graph G_temp = CSR_Graph(V,E,100);
+
+		std::cout<<V<<"\t"<<E<<std::endl;
 
 		serial_time<<V<<"\t"<<E<<"\t";
 
