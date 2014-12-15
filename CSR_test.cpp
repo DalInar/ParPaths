@@ -101,7 +101,7 @@ int main(){
 		serial_time << G_temp.BellmanFordGPU(serial_source, serial_preds, serial_path_weights) <<"\t";
 		serial_time << G_temp.BellmanFordGPU_Split(serial_source, serial_preds, serial_path_weights) <<std::endl;
 	}
-
+	serial_time.close();
 
 	return 0;
 }
