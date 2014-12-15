@@ -186,6 +186,8 @@ double CSR_Graph::BellmanFordGPU_Split(int source_, std::vector <int> &predecess
 
 	timer.stop();
 
+	std::cout<<"Iterations = "<<iter<<std::endl;
+
 	//Copy results back to host
 	//cudaMemcpy((int *) &offsets[0], d_offsets, offsets_size, cudaMemcpyDeviceToHost);
 	//cudaMemcpy((int *) &edge_dests[0], d_edge_dests, edge_dests_size, cudaMemcpyDeviceToHost);

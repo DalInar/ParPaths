@@ -12,6 +12,7 @@
 int main(){
 	std::cout<<"Hello!"<<std::endl;
 	int V=10;
+	int E;
 //	CSR_Graph G = CSR_Graph(V,15,12.3);
 //	G.print_graph();
 //
@@ -74,6 +75,29 @@ int main(){
 	GPU_time.close();
 
 	std::cout<<"Finished!"<<std::endl;
+
+
+	std::ofstream serial_time;
+	serial_time.open("serial_timing.txt");
+
+	int serial_source = 0;
+	std::vector <int> serial_preds;
+	std::vector <double> serial_path_weights;
+
+	double scale = 0.2;
+	serial_time<<"# scale = "<<scale<<std::endl;
+	serial_time<<"#V \t E \t BF \t Dij"<<std::endl;
+	for(V=100; V<=10100; V=V+500){
+		E=scale*V*V;
+		CSR_Graph G_temp = CSR_Graph(V,E,100);
+
+		serial_time<<V<<"\t"<<E<<"\t";
+
+		serial_time << G_temp.BellmanFord(serial_source, serial_preds, serial_path_weights) <<"\t";
+		serial_time << G_temp.Dijkstra(serial_source, serial_preds, serial_path_weights) << std::endl;
+	}
+
+
 	return 0;
 }
 
