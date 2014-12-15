@@ -38,9 +38,9 @@ int main(){
 	std::cout<<std::endl<<"New tests:"<<std::endl;
 
 	std::string filename = "output.txt";
-	V=1000;
-	CSR_Graph G_gpu = CSR_Graph(V,10000,12.3);
-	G_gpu.print_graph();
+	V=2000;
+	CSR_Graph G_gpu = CSR_Graph(V,100000,12.3);
+//	G_gpu.print_graph();
 	G_gpu.print_graph_to_file(filename);
 
 	std::cout<<"Bellman-Ford time: "<<G_gpu.BellmanFord(source, predecessors_BF, path_weight_BF)<<std::endl;
@@ -52,7 +52,7 @@ int main(){
 
 	std::cout<<"Are preds equal? "<< (predecessors==predecessors_BF_gpu)<< std::endl;
 	std::cout<<"Are PWs equal? "<< (predecessors==predecessors_BF_gpu)<< std::endl;
-	for(int i=0; i < V; i++){
+	for(int i=0; i < 5; i++){
 		std::cout<<"V: "<<i<<std::endl;
 		std::cout<<"Pred: "<< predecessors[i]<<"\t"<<predecessors_BF_gpu[i]<<std::endl;
 		std::cout<<"PW: "<<path_weight[i]<<"\t"<<path_weight_BF_gpu[i]<<std::endl;
