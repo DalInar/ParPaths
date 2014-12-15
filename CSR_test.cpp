@@ -38,9 +38,9 @@ int main(){
 	std::cout<<std::endl<<"New tests:"<<std::endl;
 
 	std::string filename = "output.txt";
-	V=10;
-	CSR_Graph G_gpu = CSR_Graph(V,60,12.3);
-	//G_gpu.print_graph();
+	V=6;
+	CSR_Graph G_gpu = CSR_Graph(V,10,12.3);
+	G_gpu.print_graph();
 	G_gpu.print_graph_to_file(filename);
 
 	std::cout<<"Bellman-Ford time: "<<G_gpu.BellmanFord(source, predecessors_BF, path_weight_BF)<<std::endl;
