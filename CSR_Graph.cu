@@ -7,7 +7,19 @@
 
 #include "CSR_Graph.h"
 
-__global__ void BellmanFord_split1cuda(int * finished, int V, int E, int *offsets, int *edge_dests, double *weights, int * preds, int * temp_preds, double * path_weights){
+__device__ double atomicMin(double* address, double val) {
+	unsigned long long int* address_as_ull = (unsigned long long int*)address;
+	unsigned long long int old = *address_as_ull, assumed;
+	do {
+		assumed = old;
+		old = atomicCAS(address_as_ull, assumed, __double_as_longlong( fmin(val, __longlong_as_double(assumed))) );
+		// Note: uses integer comparison to avoid hang in case of NaN (since NaN != NaN)
+		} while (assumed != old);
+	return __longlong_as_double(old);
+}
+
+__global__ void BellmanFord_split1cuda(int * finished, int V, int E, int *offsets, int *edge_dests,
+		double *weights, int * preds, int * temp_preds, double * path_weights, double * temp_path_weights){
 	//int my_vert = blockIdx.x;
 	int my_vert = blockIdx.x *blockDim.x + threadIdx.x;
 
@@ -30,15 +42,17 @@ __global__ void BellmanFord_split1cuda(int * finished, int V, int E, int *offset
 			target = edge_dests[target_index];
 			new_dist = my_dist + weights[target_index];
 			// need to change path_weights[target] and update predecessors[target]
-			if(new_dist < path_weights[target]){
-				*finished = 0;
+			// Try to make this atomic
+			if(new_dist < atomicMin(&temp_path_weights[target], new_dist) ){
 				temp_preds[target] = my_vert;
+				*finished = 0;
+				//temp_path_weights[target] = new_dist;
 			}
 		}
 	}
 }
 
-__global__ void BellmanFord_split2cuda(int V, int E, int *offsets, int *edge_dests, double *weights, int * preds, int * temp_preds, double * path_weights){
+__global__ void BellmanFord_split2cuda(int V, int E, int *offsets, int *edge_dests, double *weights, int * preds, int * temp_preds, double * path_weights, double * temp_path_weights){
 	//int my_vert = blockIdx.x;
 	int my_vert = blockIdx.x *blockDim.x + threadIdx.x;
 	int first_target_index, last_target_index;
@@ -63,7 +77,7 @@ __global__ void BellmanFord_split2cuda(int V, int E, int *offsets, int *edge_des
 			for(int i=first_target_index; i < last_target_index; i++){
 				if(edge_dests[i] == my_vert){
 					//Data race?
-					path_weights[my_vert] = path_weights[pred_vert] + weights[i];
+					temp_path_weights[my_vert] = path_weights[pred_vert] + weights[i];
 					break;
 				}
 			}
@@ -94,7 +108,9 @@ double CSR_Graph::BellmanFordGPU_Split(int source_, std::vector <int> &predecess
 	int * d_predecessors;
 	double * d_path_weight;
 	int * d_temp_predecessors;
+	double * d_temp_path_weight;
 	int * d_finished;
+	double * temp;
 
 	//Size of CSR graph
 	int offsets_size = V*sizeof(int);
@@ -113,7 +129,7 @@ double CSR_Graph::BellmanFordGPU_Split(int source_, std::vector <int> &predecess
 	cudaMalloc((void **) & d_predecessors, predecessors_size);
 	cudaMalloc((void **) & d_temp_predecessors, temp_predecessors_size);
 	cudaMalloc((void **) & d_path_weight, path_weight_size);
-	cudaMalloc((void **) & d_path_weight, path_weight_size);
+	cudaMalloc((void **) & d_temp_path_weight, path_weight_size);
 	cudaMalloc((void **) & d_finished, sizeof(int));
 
 	std::cout<<"Transferring to GPU"<<std::endl;
@@ -123,6 +139,7 @@ double CSR_Graph::BellmanFordGPU_Split(int source_, std::vector <int> &predecess
 	cudaMemcpy(d_predecessors, (int *) &predecessors[0], predecessors_size, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_temp_predecessors, (int *) &predecessors[0], temp_predecessors_size, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_path_weight, (double *) &path_weight[0], path_weight_size, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_temp_path_weight, (double *) &path_weight[0], path_weight_size, cudaMemcpyHostToDevice);
 
 
 	std::cout<<"Running kernel with <<<" << num_blocks << ", " << threads_per_block << ">>>" <<std::endl;
@@ -135,15 +152,20 @@ double CSR_Graph::BellmanFordGPU_Split(int source_, std::vector <int> &predecess
 		finished=1;
 		cudaMemcpy(d_finished, &finished, sizeof(int), cudaMemcpyHostToDevice);
 		cudaDeviceSynchronize();
-		BellmanFord_split1cuda<<<num_blocks, threads_per_block>>>(d_finished, V, E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_temp_predecessors,d_path_weight);
+		BellmanFord_split1cuda<<<num_blocks, threads_per_block>>>(d_finished, V, E, d_offsets,d_edge_dests,
+				d_weights,d_predecessors,d_temp_predecessors,d_path_weight, d_temp_path_weight);
 		cudaDeviceSynchronize();
 		cudaMemcpy(&finished, d_finished,  sizeof(int), cudaMemcpyDeviceToHost);
 		BellmanFord_split2cuda<<<num_blocks, threads_per_block>>>(V, E, d_offsets,d_edge_dests,d_weights,d_predecessors,d_temp_predecessors,d_path_weight);
 		cudaDeviceSynchronize();
-		std::cout<<finished<<std::endl;
+		temp=d_path_weight;
+		d_path_weight = d_temp_path_weight;
+		d_temp_path_weight = temp;
+
 		iter++;
 	}
 //	}
+	std::cout<<finished<<std::endl;
 	timer.stop();
 
 	//Copy results back to host
