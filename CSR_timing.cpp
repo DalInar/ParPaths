@@ -10,8 +10,8 @@ int main(){
 	num_vert.push_back(100);
 	num_vert.push_back(1000);
 	num_vert.push_back(10000);
-	num_vert.push_back(100000);
-	num_vert.push_back(1000000);
+//	num_vert.push_back(100000);
+//	num_vert.push_back(1000000);
 
 
 	scales.push_back(1);
@@ -51,7 +51,8 @@ int main(){
 
 			output << G_temp.BellmanFord(serial_source, serial_preds, serial_path_weights) <<"\t";
 			output << G_temp.Dijkstra(serial_source, serial_preds, serial_path_weights) << "\t";
-			output << G_temp.BellmanFordGPU(serial_source, serial_preds, serial_path_weights) <<"\t";
+		//	output << G_temp.BellmanFordGPU(serial_source, serial_preds, serial_path_weights) <<"\t";
+			output << 0.0 << "\t";
 			output << G_temp.BellmanFordGPU_Split(serial_source, serial_preds, serial_path_weights) <<std::endl;
 		}
 
