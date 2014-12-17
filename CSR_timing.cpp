@@ -6,19 +6,20 @@
 int main(){
 	std::vector <int> scales;
 	std::vector <int> num_vert;
-	num_vert.push_back(10);
-	num_vert.push_back(100);
-	num_vert.push_back(1000);
-	num_vert.push_back(10000);
-//	num_vert.push_back(100000);
-//	num_vert.push_back(1000000);
+//	num_vert.push_back(10);
+//	num_vert.push_back(100);
+//	num_vert.push_back(1000);
+//	num_vert.push_back(10000);
+	num_vert.push_back(100000);
+	num_vert.push_back(1000000);
 
 
 	scales.push_back(1);
+	scales.push_back(5);
 	scales.push_back(10);
-	scales.push_back(30);
-	scales.push_back(60);
-	scales.push_back(80);
+	scales.push_back(50);
+	scales.push_back(100);
+//	scales.push_back(1000);
 
 	int serial_source = 0;
 	std::vector <int> serial_preds;
@@ -29,7 +30,7 @@ int main(){
 	for(int i=0; i<scales.size(); i++){
 		scale = scales[i];
 		std::ostringstream fileNameStream;
-		fileNameStream << "CSR_timing_scale_"<< scale << ".txt";
+		fileNameStream << "CSR_timing_degree_"<< scale << ".txt";
 		std::string fileName = fileNameStream.str();
 
 		std::ofstream output;
@@ -41,7 +42,8 @@ int main(){
 		std::cout<<scale<<std::endl;
 		for(int j=0; j<num_vert.size(); j++){
 			V=num_vert[j];
-			E=(scale/100.0)*V*V;
+			//E=(scale/100.0)*V*V;
+			E=scale*V;
 			CSR_Graph G_temp = CSR_Graph(V,E,100);
 			G_temp.set_threads_per_block(64);
 
@@ -49,7 +51,8 @@ int main(){
 
 			output<<V<<"\t"<<E<<"\t";
 
-			output << G_temp.BellmanFord(serial_source, serial_preds, serial_path_weights) <<"\t";
+		//	output << G_temp.BellmanFord(serial_source, serial_preds, serial_path_weights) <<"\t";
+			output << 0.0 << "\t";
 			output << G_temp.Dijkstra(serial_source, serial_preds, serial_path_weights) << "\t";
 		//	output << G_temp.BellmanFordGPU(serial_source, serial_preds, serial_path_weights) <<"\t";
 			output << 0.0 << "\t";
