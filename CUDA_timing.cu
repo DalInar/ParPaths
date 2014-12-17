@@ -10,14 +10,16 @@ __global__ void empty_kernel(){
 __global__ void global_memory_test(int size, int trials, int * data){
 	int ID = blockIdx.x *blockDim.x + threadIdx.x;
 
-	int target = threadIdx.x + 7;
-	int over = (target/blockDim.x);
-	target = blockIdx.x*blockDim.x + target - over*blockDim.x;
 
 	if(ID < size){
 		int i;
 		int d;
+		int target;
+		int over;
 		for(i=0; i<trials; i++){
+			target = threadIdx.x + i;
+			over = (target/blockDim.x);
+			target = blockIdx.x*blockDim.x + target - over*blockDim.x;
 			d = data[target];
 			d += i;
 			data[target] = d;
@@ -30,25 +32,26 @@ __global__ void shared_memory_test(int size, int trials, int * data){
 	int LOCAL_ID = threadIdx.x;
 	extern __shared__ int s_data[];
 
-	int target = threadIdx.x + 7;
-	int local_target;
-	int over = (target/blockDim.x);
-	target = blockIdx.x*blockDim.x + target - over*blockDim.x;
-	local_target = target - blockIdx.x*blockDim.x;
 
 	if(GLOBAL_ID < size){
-		s_data[LOCAL_ID] = data[target];
-		__syncthreads();
+		int target;
+		int over;
 		int i;
 		int d;
 
+		s_data[LOCAL_ID] = data[GLOBAL_ID];
+		__syncthreads();
+
 		for(i=0; i<trials; i++){
-			d = s_data[LOCAL_ID];
+			target = threadIdx.x + i;
+			over = (target/blockDim.x);
+			target = target - over*blockDim.x;
+			d = s_data[target];
 			d += i;
-			s_data[LOCAL_ID] = d;
+			s_data[target] = d;
 		}
 
-		data[target] = s_data[LOCAL_ID];
+		data[GLOBAL_ID] = s_data[LOCAL_ID];
 	}
 }
 
