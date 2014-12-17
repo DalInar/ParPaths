@@ -13,9 +13,9 @@ int main(){
 	num_vert.push_back(100000);
 	num_vert.push_back(1000000);
 
+	std::cout<<"Test graph"<<std::endl;
 	CSR_Graph gr(10,20,34.4);
-
-	return 1;
+	std::cout<<"End test graph"<<std::endl;
 
 
 	scales.push_back(1);
