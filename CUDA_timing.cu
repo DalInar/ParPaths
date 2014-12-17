@@ -15,7 +15,7 @@ __global__ void global_memory_test(int size, int trials, int * data){
 		int d;
 		for(i=0; i<trials; i++){
 			d = data[ID];
-			d += 1;
+			d += i;
 			data[ID] = d;
 		}
 	}
@@ -33,7 +33,7 @@ __global__ void shared_memory_test(int size, int trials, int * data){
 
 		for(i=0; i<trials; i++){
 			d = s_data[LOCAL_ID];
-			d += 1;
+			d += i;
 			s_data[LOCAL_ID] = d;
 		}
 
@@ -104,7 +104,7 @@ int main(){
 
 	}
 
-	int num_access = 10000000;
+	int num_access = 100000000;
 	int n_ints=2688;
 	int mem_data_size = n_ints*sizeof(int);
 	int * mem_data;
