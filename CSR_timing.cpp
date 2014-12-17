@@ -9,9 +9,13 @@ int main(){
 //	num_vert.push_back(10);
 //	num_vert.push_back(100);
 //	num_vert.push_back(1000);
-//	num_vert.push_back(10000);
+	num_vert.push_back(10000);
 	num_vert.push_back(100000);
 	num_vert.push_back(1000000);
+
+	CSR_Graph gr(10,20,34.4);
+
+	return 1;
 
 
 	scales.push_back(1);

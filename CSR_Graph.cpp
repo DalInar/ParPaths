@@ -11,6 +11,18 @@ bool operator<(const Vertex &a, const Vertex &b){
 	return (a.dist < b.dist) && (a.idx != b.idx);
 }
 
+bool operator<(const Edge &e1, const Edge &e2){
+	if(e1.source < e2.source){
+		return true;
+	}
+	else if(e1.source > e2.source){
+		return false;
+	}
+	else{
+		return (e1.dest < e2.dest);
+	}
+}
+
 CSR_Graph::CSR_Graph(std::string filename):V(0),E(0),max_weight(-1){
 	std::ifstream input;
 	input.open(filename.c_str());
@@ -68,34 +80,46 @@ CSR_Graph::CSR_Graph(int V_, int E_, double max_weight_):V(V_),E(E_),max_weight(
 	set_threads_per_block(V);
 
 	//Temporary adjacency matrix to assist in creating random graph
-	std::vector< std::vector<double> > Adj(V, std::vector<double>(V));
-	for(int i=0; i<V; i++){
-		for(int j=0; j<V; j++){
-			Adj[i][j]=-1.0;
-		}
-	}
+	//This uses too much memory!!!
+//	std::vector< std::vector<double> > Adj(V, std::vector<double>(V));
+//	for(int i=0; i<V; i++){
+//		for(int j=0; j<V; j++){
+//			Adj[i][j]=-1.0;
+//		}
+//	}
+
+	std::set <Edge> edges;
 
 	//Generate a random graph by randomly picking edges
 	int E_temp=0;
 	int s,d;
+	double weight;
 	while(E_temp < E){
 		s=rand()%V;
 		d=rand()%V;
-		if(s != d && Adj[s][d] < 0){
-			Adj[s][d] = (rand()/(double)((double)RAND_MAX + 1)) * max_weight;
+		weight = (rand()/(double)((double)RAND_MAX + 1)) * max_weight;
+		//Add edge if valid and not already in edge set
+		if(s != d && edges.find( Edge(s,d,weight) ) == edges.end()){
+			edges.insert(Edge(s,d,weight));
 			E_temp += 1;
 		}
 	}
 
 	E_temp=0;
+	std::set <Edge>::iterator e_iter= edges.begin();
 	for(int s=0; s<V; s++) {
 		offsets.push_back(E_temp);
-		for(int d=0; d<V; d++) {
-			if(Adj[s][d] >= 0) {
-				E_temp += 1;
-				edge_dests.push_back(d);
-				weights.push_back(Adj[s][d]);
-			}
+		while((*e_iter).source == s) {
+			std::cout<<"Adding edge "<<(*e_iter).source<< " "<<(*e_iter).dest<<" "<<(*e_iter).weight<<std::endl;
+			edge_dests.push_back((*e_iter).dest);
+			weights.push_back((*e_iter).dest);
+			E_temp += 1;
+			e_iter++;
+//			if(Adj[s][d] >= 0) {
+//				E_temp += 1;
+//				edge_dests.push_back(d);
+//				weights.push_back(Adj[s][d]);
+//			}
 		}
 	}
 }

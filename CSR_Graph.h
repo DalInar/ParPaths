@@ -27,6 +27,15 @@ struct Vertex{
 
 bool operator<(const Vertex &a, const Vertex &b);
 
+struct Edge{
+	Edge(int s, int d, double w):source(s),dest(d),weight(w){}
+	int source;
+	int dest;
+	double weight;
+};
+
+bool operator<(const Edge &e1, const Edge &e2);
+
 
 class CSR_Graph
 {
