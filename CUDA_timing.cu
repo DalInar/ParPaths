@@ -10,13 +10,17 @@ __global__ void empty_kernel(){
 __global__ void global_memory_test(int size, int trials, int * data){
 	int ID = blockIdx.x *blockDim.x + threadIdx.x;
 
+	int target = threadIdx.x + 7;
+	int over = (target/blockDim.x);
+	target = blockIdx.x*blockDim.x + target - over*blockDim.x;
+
 	if(ID < size){
 		int i;
 		int d;
 		for(i=0; i<trials; i++){
-			d = data[ID];
+			d = data[target];
 			d += i;
-			data[ID] = d;
+			data[target] = d;
 		}
 	}
 }
@@ -26,8 +30,15 @@ __global__ void shared_memory_test(int size, int trials, int * data){
 	int LOCAL_ID = threadIdx.x;
 	extern __shared__ int s_data[];
 
+	int target = threadIdx.x + 7;
+	int local_target;
+	int over = (target/blockDim.x);
+	target = blockIdx.x*blockDim.x + target - over*blockDim.x;
+	local_target = target - blockIdx.x*blockDim.x;
+
 	if(GLOBAL_ID < size){
-		s_data[LOCAL_ID] = data[GLOBAL_ID];
+		s_data[LOCAL_ID] = data[target];
+		__syncthreads();
 		int i;
 		int d;
 
@@ -37,7 +48,7 @@ __global__ void shared_memory_test(int size, int trials, int * data){
 			s_data[LOCAL_ID] = d;
 		}
 
-		data[GLOBAL_ID] = s_data[LOCAL_ID];
+		data[target] = s_data[LOCAL_ID];
 	}
 }
 
