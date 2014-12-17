@@ -110,7 +110,7 @@ CSR_Graph::CSR_Graph(int V_, int E_, double max_weight_):V(V_),E(E_),max_weight(
 	for(int s=0; s<V; s++) {
 		offsets.push_back(E_temp);
 		while((*e_iter).source == s) {
-			std::cout<<"Adding edge "<<(*e_iter).source<< " "<<(*e_iter).dest<<" "<<(*e_iter).weight<<std::endl;
+			//std::cout<<"Adding edge "<<(*e_iter).source<< " "<<(*e_iter).dest<<" "<<(*e_iter).weight<<std::endl;
 			edge_dests.push_back((*e_iter).dest);
 			weights.push_back((*e_iter).dest);
 			E_temp += 1;
