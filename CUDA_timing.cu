@@ -7,6 +7,40 @@ __global__ void empty_kernel(){
 
 }
 
+__global__ void global_memory_test(int size, int trials, int * data){
+	int ID = blockIdx.x *blockDim.x + threadIdx.x;
+
+	if(ID < size){
+		int i;
+		int d;
+		for(i=0; i<trials; i++){
+			d = data[ID];
+			d += 1;
+			data[ID] = d;
+		}
+	}
+}
+
+__global__ void shared_memory_test(int size, int trials, int * data){
+	int GLOBAL_ID = blockIdx.x *blockDim.x + threadIdx.x;
+	int LOCAL_ID = threadIdx.x;
+	extern __shared__ int s_data[];
+
+	if(GLOBAL_ID < size){
+		s_data[LOCAL_ID] = data[GLOBAL_ID];
+		int i;
+		int d;
+
+		for(i=0; i<trials; i++){
+			d = s_data[LOCAL_ID];
+			d += 1;
+			s_data[LOCAL_ID] = d;
+		}
+
+		data[GLOBAL_ID] = s_data[LOCAL_ID];
+	}
+}
+
 int main(){
 
 	double * data;
@@ -14,9 +48,6 @@ int main(){
 
 	std::ofstream output;
 	output.open("CUDA_kernel_timing.txt");
-
-	int num_blocks;
-	int num_threads;
 
 	int trials = 100000;
 
@@ -72,6 +103,42 @@ int main(){
 		output<<trials<<" memory writes and reads to GPU of size "<<data_size<<", average time = "<< ( (double) timer.elapsed().wall / 1000000000.0 ) / trials<<std::endl;
 
 	}
+
+	int num_access = 10000000;
+	int n_ints=2688;
+	int mem_data_size = n_ints*sizeof(int);
+	int * mem_data;
+	int * d_mem_data;
+
+	int num_threads_per_block = 32;
+	int num_blocks = n_ints / num_threads_per_block;
+
+	mem_data = (int *) malloc(mem_data_size);
+	cudaMalloc((void **) & d_mem_data, mem_data_size);
+
+	for(int i=0; i<n_ints; i++){
+		mem_data[i] = i;
+	}
+
+	cudaMemcpy(d_mem_data, mem_data, mem_data_size, cudaMemcpyHostToDevice);
+
+	timer.start();
+	global_memory_test<<<num_blocks, num_threads_per_block>>>(n_ints, num_access, d_mem_data);
+	cudaDeviceSynchronize();
+	timer.stop();
+
+	output<<num_access<<" global memory writes and reads on GPU, average time per read/write= "<< ( (double) timer.elapsed().wall / 1000000000.0 ) / num_access<<std::endl;
+
+	cudaMemcpy(d_mem_data, mem_data, mem_data_size, cudaMemcpyHostToDevice);
+
+	timer.start();
+	shared_memory_test<<<num_blocks, num_threads_per_block, num_threads_per_block*sizeof(int)>>>(n_ints, num_access, d_mem_data);
+	cudaDeviceSynchronize();
+	timer.stop();
+
+	output<<num_access<<" shared memory writes and reads on GPU, average time per read/write= "<< ( (double) timer.elapsed().wall / 1000000000.0 ) / num_access<<std::endl;
+
+
 
 
 	return 0;
