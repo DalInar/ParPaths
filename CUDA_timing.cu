@@ -99,6 +99,8 @@ int main(){
 	num_doubles.push_back(100000);
 	num_doubles.push_back(1000000);
 	num_doubles.push_back(10000000);
+	num_doubles.push_back(100000000);
+	num_doubles.push_back(1000000000);
 
 	trials = 100;
 	int data_size;
