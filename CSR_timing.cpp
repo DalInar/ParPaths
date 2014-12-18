@@ -6,12 +6,12 @@
 int main(){
 	std::vector <int> scales;
 	std::vector <int> num_vert;
-//	num_vert.push_back(10);
-//	num_vert.push_back(100);
-//	num_vert.push_back(1000);
-	num_vert.push_back(10000);
-	num_vert.push_back(100000);
-	num_vert.push_back(1000000);
+	num_vert.push_back(10);
+	num_vert.push_back(100);
+	num_vert.push_back(1000);
+	//num_vert.push_back(10000);
+	//num_vert.push_back(100000);
+//	num_vert.push_back(1000000);
 
 	std::cout<<"Test graph"<<std::endl;
 	CSR_Graph gr(10,20,34.4);
@@ -19,10 +19,10 @@ int main(){
 
 
 	scales.push_back(1);
-	scales.push_back(5);
 	scales.push_back(10);
 	scales.push_back(50);
-	scales.push_back(100);
+	scales.push_back(80);
+	scales.push_back(90);
 //	scales.push_back(1000);
 
 	int serial_source = 0;
@@ -34,7 +34,7 @@ int main(){
 	for(int i=0; i<scales.size(); i++){
 		scale = scales[i];
 		std::ostringstream fileNameStream;
-		fileNameStream << "CSR_timing_degree_"<< scale << ".txt";
+		fileNameStream << "CSR_timing_large_scale_"<< scale << ".txt";
 		std::string fileName = fileNameStream.str();
 
 		std::ofstream output;
@@ -46,8 +46,8 @@ int main(){
 		std::cout<<scale<<std::endl;
 		for(int j=0; j<num_vert.size(); j++){
 			V=num_vert[j];
-			//E=(scale/100.0)*V*V;
-			E=scale*V;
+			E=(scale/100.0)*V*V;
+			//E=scale*V;
 			CSR_Graph G_temp = CSR_Graph(V,E,100);
 			G_temp.set_threads_per_block(64);
 
